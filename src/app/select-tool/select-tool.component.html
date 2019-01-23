@@ -1,9 +1,0 @@
-<div #selectDiv></div>
-<mat-form-field class="example-full-width">
-    <input matInput placeholder="Buffer distance (feet)" type="number" [(ngModel)]="distance" (input)="inputChanged($event)" >
-    <button mat-button *ngIf="distance" matSuffix mat-icon-button aria-label="Clear" (click)="distance = 0;shared">
-        <mat-icon>close</mat-icon>
-      </button>    
-  </mat-form-field>
-<p></p>
-  <button mat-button *ngIf="shared.selectedGraphic.getValue()" (click)="propertyBuffered(shared.selectedGraphic.getValue())">Buffer Property</button>
