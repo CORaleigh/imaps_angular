@@ -1,0 +1,20 @@
+<div class="searchContainer">
+<form [formGroup]="searchForm">
+  <mat-form-field class="example-full-width">
+      <input (input)="inputChanged($event)" matInput placeholder="Address, owner, PIN, REID, or street"  formControlName="searchGroup" [formControl]="control" [matAutocomplete]="searchGroup">
+      <mat-autocomplete #searchGroup="matAutocomplete" (optionSelected)="accountSelected($event)" [displayWith]="displayFn">
+      <mat-optgroup *ngFor="let group of searchGroups" [label]="group.type">
+          <mat-option *ngFor="let value of group.values" [value]="value">
+          
+              <span *ngIf="value.STREET">{{value.STREET}}</span>
+              <span *ngIf="value.ADDRESS">{{value.ADDRESS}}</span>
+              <span *ngIf="value.PIN_NUM && !value.ADDRESS">{{value.PIN_NUM}}</span>               
+              <span *ngIf="value.REID">{{value.REID}}</span>   
+              <span *ngIf="value.OWNER">{{value.OWNER}}</span>                           
+
+          </mat-option>
+      </mat-optgroup>
+  </mat-autocomplete>
+  </mat-form-field>   
+  </form>  
+</div>
