@@ -77,14 +77,13 @@ export class MapComponent implements OnInit {
 
   async initializeMap() {
     try {
-      const [WebMap, MapView, config, SimpleFillSymbol, Graphic, GraphicsLayer, CoordinateConversion, ScaleBar, Fullscreen, Track, Compass, BasemapGallery, LayerList, Search, Expand] = await loadModules([
+      const [WebMap, MapView, config, SimpleFillSymbol, Graphic, GraphicsLayer, ScaleBar, Fullscreen, Track, Compass, BasemapGallery, LayerList, Search, Expand] = await loadModules([
         'esri/WebMap',
         'esri/views/MapView',
         'esri/config',
         'esri/symbols/SimpleFillSymbol',
         'esri/Graphic',
         'esri/layers/GraphicsLayer',
-        "esri/widgets/CoordinateConversion",        
         "esri/widgets/ScaleBar",
         "esri/widgets/Fullscreen",
         "esri/widgets/Track",
@@ -119,8 +118,6 @@ export class MapComponent implements OnInit {
       // Now execute additional processes
       mapView.when(() => {
         this.mapLoaded.emit(true);
-        let cc:esri.CoordinateConversion = new CoordinateConversion({view:mapView})
-        mapView.ui.add(cc, "bottom-left");
         let scale:esri.ScaleBar = new ScaleBar({view:mapView});
         mapView.ui.add(scale, "bottom-left");
         let full:esri.Fullscreen = new Fullscreen({view:mapView});

@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
+html, body { height: 100%; overflow:hidden }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-autocomplete-panel {
     max-height: 500px !important;
@@ -8,4 +8,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mat-tab-body-wrapper {
     height: 100% !important;
+
+}
+
+
+.mat-tab-body {
+    overflow-x: hidden;
+    overflow-y: auto;
 }

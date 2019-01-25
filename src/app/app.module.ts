@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavComponent } from './nav/nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule, MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule, MatSortModule, MatCardModule, MatSelectModule, MatCheckboxModule } from '@angular/material';
+import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule, MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule, MatSortModule, MatCardModule, MatSelectModule, MatCheckboxModule, MatButtonToggleModule } from '@angular/material';
 import { MapComponent } from './map/map.component';
 import { PropertyComponent } from './property/property.component';
 import { PropertySearchComponent } from './property-search/property-search.component';
@@ -18,6 +18,9 @@ import { ToolsComponent } from './tools/tools.component';
 import { SketchToolComponent } from './sketch-tool/sketch-tool.component';
 import { SelectToolComponent } from './select-tool/select-tool.component';
 import { MccColorPickerModule } from 'material-community-components';
+import { MeaasureToolComponent } from './meaasure-tool/meaasure-tool.component';
+import { MeasureToolComponent } from './measure-tool/measure-tool.component';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,9 @@ import { MccColorPickerModule } from 'material-community-components';
     PropertyResultsComponent,
     ToolsComponent,
     SketchToolComponent,
-    SelectToolComponent
+    SelectToolComponent,
+    MeaasureToolComponent,
+    MeasureToolComponent
   ],
   imports: [
     BrowserModule,
@@ -56,6 +61,8 @@ import { MccColorPickerModule } from 'material-community-components';
     MatSelectModule,
     MatFormFieldModule,
     MatCheckboxModule,
+    MatButtonToggleModule,
+    ColorPickerModule,
     MccColorPickerModule.forRoot({
       used_colors: ['#000000', '#123456', '#777666']
     }),

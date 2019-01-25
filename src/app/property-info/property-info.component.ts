@@ -7,9 +7,9 @@ import { SharedService } from '../shared.service';
   styleUrls: ['./property-info.component.css']
 })
 export class PropertyInfoComponent implements OnInit {
-  private _info:any;
-  private _photos:any[];
-  private _deeds:any[];
+   _info:any;
+   _photos:any[];
+   _deeds:any[];
   sections:string[] = ['Property', 'Ownership', 'Deeds'];
   constructor(private shared:SharedService) { }
   @ViewChild('Property') private propertyEl: ElementRef;

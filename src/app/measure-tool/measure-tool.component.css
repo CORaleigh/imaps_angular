@@ -1,0 +1,14 @@
+.esri-area-measurement-3d{
+    visibility: hidden;
+}
+
+.esri-coordinate-conversion {
+    visibility: hidden;
+    width: 100%;
+}
+
+.esri-direct-line-measurement-3d {
+    visibility: hidden;
+
+
+}

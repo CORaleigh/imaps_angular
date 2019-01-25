@@ -21,7 +21,7 @@ export class SelectToolComponent implements OnInit {
     this.shared.mapView.subscribe(mapView => {
       if (mapView) {
         this._mapView = mapView;
-        debugger
+        
         this.initialize();
 
       }
@@ -52,7 +52,7 @@ export class SelectToolComponent implements OnInit {
         }
 
       });
-      debugger
+      
         this._select = new Sketch({layer:layer, view: this._mapView, container:this.selectEl.nativeElement});
       //mapView.ui.add(sketch, 'top-right');
       this._select.on('create', (event) => {

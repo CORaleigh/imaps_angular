@@ -25,7 +25,7 @@
   <button mat-button *ngIf="loggedIn" (click)="logOutClicked()">Logout</button> -->
 </mat-toolbar>
 <mat-sidenav-container class="sidenav-container dark-theme">
-    <mat-sidenav #tooldrawer class="sidenav" fixedInViewport="true"
+    <mat-sidenav #tooldrawer class="toolnav sidenav" fixedInViewport="true"
         [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
         [mode]="(isHandset$ | async) ? 'over' : 'side'"
         [opened]="!(isHandset$ | async)"
@@ -41,7 +41,7 @@
         [zoom]="mapZoomLevel">
       </app-map>
     </mat-sidenav-content>
-    <mat-sidenav #searchdrawer class="sidenav" fixedInViewport="true"
+    <mat-sidenav #searchdrawer class="searchnav sidenav" fixedInViewport="true"
         [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
         [mode]="(isHandset$ | async) ? 'over' : 'side'"
         [opened]="!(isHandset$ | async)"
