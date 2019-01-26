@@ -17,7 +17,7 @@ export class PropertyResultsComponent implements OnInit {
   selection:SelectionModel<any> = new SelectionModel<any>(false, []);    
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['select','SITE_ADDRESS', 'OWNER', 'PIN_NUM', 'PIN_EXT'];
+  displayedColumns = ['select','SITE_ADDRESS', 'OWNER', 'PIN_NUM'];
   rowClicked(row) {
     this.shared.propertyInfo.next({attributes: row});
   };

@@ -25,7 +25,7 @@ export class SelectToolComponent implements OnInit {
         this.initialize();
 
       }
-    })    
+    });
   }
   inputChanged(event) {
     this.shared.bufferDistance.next(Number(event.target.value));

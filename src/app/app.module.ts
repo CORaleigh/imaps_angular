@@ -21,6 +21,8 @@ import { MccColorPickerModule } from 'material-community-components';
 import { MeaasureToolComponent } from './meaasure-tool/meaasure-tool.component';
 import { MeasureToolComponent } from './measure-tool/measure-tool.component';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { PrintToolComponent } from './print-tool/print-tool.component';
+import { BookmarksComponent } from './bookmarks/bookmarks.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,9 @@ import { ColorPickerModule } from 'ngx-color-picker';
     SketchToolComponent,
     SelectToolComponent,
     MeaasureToolComponent,
-    MeasureToolComponent
+    MeasureToolComponent,
+    PrintToolComponent,
+    BookmarksComponent
   ],
   imports: [
     BrowserModule,

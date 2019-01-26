@@ -11,3 +11,32 @@
 .table-container {
   overflow-x: hidden;
 }
+
+.mat-column-SITE_ADDRESS {
+  max-width: 30px;
+  margin:2px;
+
+}
+
+.mat-column-OWNER {
+  max-width: 80px;
+  margin:2px;
+
+}
+
+.mat-column-PIN_NUM {
+  max-width: 30px;
+  margin:2px;
+}
+
+
+
+td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type, th.mat-header-cell:first-of-type {
+  padding-left: 0px;
+} 
+
+.mat-cell {
+  word-break: break-word;
+  padding: 2px;
+
+}

@@ -25,13 +25,9 @@
     <!-- Pin Column -->
     <ng-container matColumnDef="PIN_NUM">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>PIN</th>
-      <td mat-cell *matCellDef="let row">{{row.PIN_NUM}}</td>
+      <td mat-cell *matCellDef="let row">{{row.PIN_NUM}} {{row.PIN_EXT}}</td>
     </ng-container>
-    <!-- Pin ext Column -->
-    <ng-container matColumnDef="PIN_EXT">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Ext</th>
-      <td mat-cell *matCellDef="let row">{{row.PIN_EXT}}</td>
-    </ng-container>    
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 

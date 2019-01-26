@@ -16,3 +16,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     overflow-x: hidden;
     overflow-y: auto;
 }
+
+.mat-tab-label {
+    min-width: 0px !important;
+    width: auto !important;
+}
