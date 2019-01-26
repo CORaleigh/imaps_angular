@@ -32,7 +32,7 @@ export class SketchToolComponent implements OnInit {
       this._mapView.map.add(layer);
       let sketch:esri.Sketch = new Sketch({layer:layer, view: this._mapView, container:this.sketchEl.nativeElement});
       sketch.on('create', (event) => {
-        console.log(event);
+        if (event)
 
         if (event.state === 'start') {
           event.graphic.symbol = {

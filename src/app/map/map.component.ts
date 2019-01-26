@@ -164,6 +164,44 @@ export class MapComponent implements OnInit {
           if (layer.title.indexOf('Property') > -1) {
             mapView.whenLayerView(layer).then((layerView: esri.FeatureLayerView) => {
               this._propertyLayer = layerView.layer;
+              mapView.on('hold', e => {
+                let geometry = e.mapPoint;
+                this._propertyLayer.queryFeatures({geometry: geometry, returnGeometry: true, outFields: ['OBJECTID']}).then(result => {
+                  let oids = [];
+                  result.features.forEach(feature => {
+                    oids.push(feature.attributes.OBJECTID);
+                    
+                  });
+                  this.shared.propertyIds.next(oids);
+                  singleGraphics.removeAll();
+                  multiGraphics.removeAll();
+                  if (geometry) {
+                    singleGraphics.add(new Graphic({geometry:geometry, symbol: {
+                      color: [ 51,51, 204, 0 ],
+                      style: "solid",
+                      outline: {  // autocasts as new SimpleLineSymbol()   
+                        color: "red",
+                        width: 2
+                      }
+                    }}));
+                  }
+                  this._propertyLayer.queryRelatedFeatures({relationshipId: 0, objectIds: oids, outFields: ['*']}).then(result => {
+                    let data = [];
+                    oids.forEach(oid => {
+                      if (result[oid]) {
+                        result[oid].features.forEach(f => {
+                          data.push(f.attributes);
+                        });
+                      }
+                    });
+                    this.shared.propertyResults.next(data);
+                    if (data.length === 1) {
+                      this.shared.propertyInfo.next({attributes: data[0]});
+                    }
+                  });
+            
+                  });
+              });
               this.shared.propertyIds.subscribe(ids => {
 
                 if (ids.length > 0) {
