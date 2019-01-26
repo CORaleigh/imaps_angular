@@ -30,7 +30,7 @@ export class PrintToolComponent implements OnInit {
       let print:esri.Print = new Print({
         view: this._mapView,
         container: this.printEl.nativeElement,
-        printServiceUrl: "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        printServiceUrl: "https://maps.raleighnc.gov/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
       });
 
 
