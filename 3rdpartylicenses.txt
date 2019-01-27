@@ -618,9 +618,6 @@ MIT
 
 @angular/material/card
 
-material-community-components
-MIT
-
 zone.js
 MIT
 The MIT License
