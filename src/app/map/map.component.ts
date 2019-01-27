@@ -119,18 +119,13 @@ export class MapComponent implements OnInit {
       const mapView: esri.MapView = new MapView(mapViewProperties);
 
       let defineLayerListActions = function (event) {
-        if (event.item.layer.type != 'group') {
 
+        if (event.item.layer.type != 'group') {
+          event.item.panel = {
+            content: "legend",
+            open: false
+          };
           event.item.actionsSections = [
-            [{
-              title: "Go to full extent",
-              className: "esri-icon-zoom-out-fixed",
-              id: "full-extent"
-            }, {
-              title: "Layer information",
-              className: "esri-icon-description",
-              id: "information"
-            }],
             [{
               title: "Increase opacity",
               className: "esri-icon-up",
@@ -154,12 +149,16 @@ export class MapComponent implements OnInit {
               let groupId = layer.title.substr(0, layer.title.indexOf(' - '));
               layer.title = layer.title.replace(groupId + ' - ', '');
               if (mapView.map.findLayerById(groupId)) {
+                
                 (mapView.map.findLayerById(groupId) as esri.GroupLayer).add(layer);
+                i--;
+
               } else {
                 let groupLayer:esri.GroupLayer = new GroupLayer({title: groupId, id: groupId});
                 layer.title = layer.title.replace(groupId + ' - ', '');
-                groupLayer.add(layer);
                 mapView.map.add(groupLayer);
+
+                groupLayer.add(layer);
                 i--;
               }
 
@@ -228,14 +227,20 @@ export class MapComponent implements OnInit {
   
               if (event.item.layer.opacity + 0.1 < 1) {
                 event.item.layer.opacity += 0.1;
+              } else {
+                event.item.layer.opacity = 1;
+
               }
             } else if (id === "decrease-opacity") {
   
               // if the decrease-opacity action is triggered, then
               // decrease the opacity of the GroupLayer by 0.25
   
-              if (event.layer.opacity - 0.1 > 0) {
+              if (event.item.layer.opacity - 0.1  > 0) {
                 event.item.layer.opacity -= 0.1;
+              } else {
+                event.item.layer.opacity = 0;
+
               }
             }
           });
@@ -269,6 +274,7 @@ export class MapComponent implements OnInit {
                   multiGraphics.removeAll();
                   if (geometry) {
                     singleGraphics.add(new Graphic({geometry:geometry, symbol: {
+                      type: 'simple-fill',
                       color: [ 51,51, 204, 0 ],
                       style: "solid",
                       outline: {  // autocasts as new SimpleLineSymbol()   

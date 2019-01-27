@@ -34,6 +34,16 @@ export class PropertyInfoComponent implements OnInit {
     });        
   }
 
+  openLink(url) {
+    window.open(url, '_blank');
+  }
+  openGoogleStreetview() {
+    console.log(this.shared.selectedGraphic.getValue().geometry);
+    let lat =this.shared.selectedGraphic.getValue().geometry.centroid.latitude;
+    let lng =this.shared.selectedGraphic.getValue().geometry.centroid.longitude;
+    let url = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lat+','+lng;
+    window.open(url, '_blank');
+  }
   scroll(el) {
     if (el === 'Property') {
       this.propertyEl.nativeElement.scrollIntoView();
