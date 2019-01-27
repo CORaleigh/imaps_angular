@@ -42,7 +42,7 @@ export class SelectToolComponent implements OnInit {
         "esri/Color"
 
       ]);
-      let layer:esri.GraphicsLayer = new GraphicsLayer();
+      let layer:esri.GraphicsLayer = new GraphicsLayer({title: 'selectGraphics', listMode: 'hide'});
       this._mapView.map.add(layer);
       this._mapView.map.allLayers.forEach(l => { 
         if (l.title) {

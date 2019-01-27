@@ -28,7 +28,7 @@ export class SketchToolComponent implements OnInit {
         "esri/Color"
       ]);
       
-      let layer:esri.GraphicsLayer = new GraphicsLayer();
+      let layer:esri.GraphicsLayer = new GraphicsLayer({title: 'sketchGraphics', listMode: 'hide'});
       this._mapView.map.add(layer);
       let sketch:esri.Sketch = new Sketch({layer:layer, view: this._mapView, container:this.sketchEl.nativeElement});
       sketch.on('create', (event) => {

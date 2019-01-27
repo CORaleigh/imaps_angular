@@ -16,6 +16,7 @@ import { loadModules } from 'esri-loader';
 import esri = __esri;
 import { SharedService } from '../shared.service';
 import { PropertyService } from '../property.service';
+import { Expression, isNgTemplate } from '@angular/compiler';
 
 @Component({
   selector: 'app-map',
@@ -77,13 +78,15 @@ export class MapComponent implements OnInit {
 
   async initializeMap() {
     try {
-      const [WebMap, MapView, config, SimpleFillSymbol, Graphic, GraphicsLayer, ScaleBar, Fullscreen, Track, Compass, BasemapGallery, LayerList, Search, Expand] = await loadModules([
+      const [WebMap, MapView, config, SimpleFillSymbol, Graphic, GraphicsLayer, GroupLayer, ScaleBar, Fullscreen, Track, Compass, BasemapGallery, LayerList, Search, Expand, Collection] = await loadModules([
         'esri/WebMap',
         'esri/views/MapView',
         'esri/config',
         'esri/symbols/SimpleFillSymbol',
         'esri/Graphic',
         'esri/layers/GraphicsLayer',
+        'esri/layers/GroupLayer',
+
         "esri/widgets/ScaleBar",
         "esri/widgets/Fullscreen",
         "esri/widgets/Track",
@@ -91,7 +94,8 @@ export class MapComponent implements OnInit {
         "esri/widgets/BasemapGallery",
         "esri/widgets/LayerList",
         "esri/widgets/Search",
-        "esri/widgets/Expand"        
+        "esri/widgets/Expand",
+        "esri/core/Collection"  
       ]);
 
       config.portalUrl = this._portalUrl;
@@ -114,9 +118,52 @@ export class MapComponent implements OnInit {
 
       const mapView: esri.MapView = new MapView(mapViewProperties);
 
+      let defineLayerListActions = function (event) {
+        if (event.item.layer.type != 'group') {
+
+          event.item.actionsSections = [
+            [{
+              title: "Go to full extent",
+              className: "esri-icon-zoom-out-fixed",
+              id: "full-extent"
+            }, {
+              title: "Layer information",
+              className: "esri-icon-description",
+              id: "information"
+            }],
+            [{
+              title: "Increase opacity",
+              className: "esri-icon-up",
+              id: "increase-opacity"
+            }, {
+              title: "Decrease opacity",
+              className: "esri-icon-down",
+              id: "decrease-opacity"
+            }]
+          ];
+        }
+      };
+
       // All resources in the MapView and the map have loaded.
       // Now execute additional processes
-      mapView.when(() => {
+      mapView.when(() => { 
+        let i = 0;
+        do  {
+          let layer = mapView.map.layers.getItemAt(i);
+            if (layer.title.indexOf(' - ') > -1 && layer.type === 'feature') {
+              let groupId = layer.title.substr(0, layer.title.indexOf(' - '));
+              layer.title = layer.title.replace(groupId + ' - ', '');
+              if (mapView.map.findLayerById(groupId)) {
+                (mapView.map.findLayerById(groupId) as esri.GroupLayer).add(layer);
+              } else {
+                let groupLayer:esri.GroupLayer = new GroupLayer({title: groupId, id: groupId});
+                layer.title = layer.title.replace(groupId + ' - ', '');
+                groupLayer.add(layer);
+                mapView.map.add(groupLayer);
+                i--;
+              }
+
+        } i++;} while (i < mapView.map.layers.length - 1);
         this.mapLoaded.emit(true);
         let scale:esri.ScaleBar = new ScaleBar({view:mapView});
         mapView.ui.add(scale, "bottom-left");
@@ -144,23 +191,68 @@ export class MapComponent implements OnInit {
             //@ts-ignore
             content: basemap.domNode}
           )          
-        mapView.ui.add(expand, "top-right");      
+        mapView.ui.add(expand, "top-right");   
+
         let layerList:esri.LayerList = new LayerList(
           {view:mapView,
             container: document.createElement("div"),
+            listItemCreatedFunction: defineLayerListActions
           });
         expand = new Expand({
             view: mapView, 
             expandIconClass: "esri-icon-layer-list",
             //@ts-ignore
             content: layerList.domNode}
-          )          
+          );
+          layerList.on("trigger-action", function(event) {
+
+            // Capture the action id.
+            var id = event.action.id;
+  
+            if (id === "full-extent") {
+  
+              // if the full-extent action is triggered then navigate
+              // to the full extent of the visible layer
+              mapView.goTo(event.item.layer.fullExtent);
+  
+            } else if (id === "information") {
+  
+              // if the information action is triggered, then
+              // open the item details page of the service layer
+              window.open(event.item.layer.url);
+  
+            } else if (id === "increase-opacity") {
+  
+              // if the increase-opacity action is triggered, then
+              // increase the opacity of the GroupLayer by 0.25
+  
+              if (event.item.layer.opacity + 0.1 < 1) {
+                event.item.layer.opacity += 0.1;
+              }
+            } else if (id === "decrease-opacity") {
+  
+              // if the decrease-opacity action is triggered, then
+              // decrease the opacity of the GroupLayer by 0.25
+  
+              if (event.layer.opacity - 0.1 > 0) {
+                event.item.layer.opacity -= 0.1;
+              }
+            }
+          });
         mapView.ui.add(expand, "top-right");                  
         this.shared.mapView.next(mapView);
-        let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics'});
-        let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics'});
+        let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
+        let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics', listMode: 'hide'});
         mapView.map.addMany([multiGraphics, singleGraphics]);
+        mapView.on('layerview-create', event => {
+          if (event.layer.title) {
+
+          } else {
+            event.layer.listMode = 'hide';
+          }
+        });
         mapView.map.allLayers.forEach(layer => {
+
           if (layer.title.indexOf('Property') > -1) {
             mapView.whenLayerView(layer).then((layerView: esri.FeatureLayerView) => {
               this._propertyLayer = layerView.layer;

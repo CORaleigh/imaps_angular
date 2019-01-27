@@ -27,6 +27,7 @@ group:any = {};
       let cc:esri.CoordinateConversion = new CoordinateConversion({view:this._mapView, container: this.coordEl.nativeElement});
       let line:esri.DistanceMeasurement2D = new DistanceMeasurement2D({view:this._mapView, container: this.areaEl.nativeElement});
       let area:esri.AreaMeasurement2D = new AreaMeasurement2D({view:this._mapView, container: this.lineEl.nativeElement});
+      
       setTimeout(() => {
         this.toolLoaded = true;
 
