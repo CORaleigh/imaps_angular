@@ -21,3 +21,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     min-width: 0px !important;
     width: auto !important;
 }
+
+app-nav {
+    overflow: hidden;
+}
