@@ -2,12 +2,21 @@
   height: calc(100% - 64px);
 
 }
-
 .sidenav {
-  max-width: 90%;
-  top:64px !important;
+  top:0px !important;
   padding:1em;  
+  max-width: 100%;
+
 }
+
+
+@media only screen and (min-width: 768px) {
+  .sidenav {
+    max-width: 90%;
+    top:64px !important;
+    padding:1em;  
+  }
+} 
 
 .searchnav {
   width: 400px;
@@ -28,9 +37,7 @@
   z-index: 1;
 }
 
-.mat-tab-group {
-  height: calc(100% - 70px);
-}
+
 
 .example-fill-remaining-space {
   /* This fills the remaining space, by using flexbox. 

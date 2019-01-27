@@ -4,7 +4,7 @@
     type="button"
     aria-label="Toggle sidenav"
     mat-icon-button
-    (click)="tooldrawer.toggle()" position="end"
+    (click)="toggle(tooldrawer, searchdrawer)" position="end"
    >
     <mat-icon aria-label="Side nav toggle icon">build</mat-icon>
   </button>    
@@ -15,7 +15,7 @@
     type="button"
     aria-label="Toggle sidenav"
     mat-icon-button
-    (click)="searchdrawer.toggle()"
+    (click)="toggle(searchdrawer, tooldrawer)"
    >
     <mat-icon aria-label="Side nav toggle icon">search</mat-icon>
   </button>
@@ -28,9 +28,22 @@
     <mat-sidenav #tooldrawer class="toolnav sidenav" fixedInViewport="true"
         [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
         [mode]="(isHandset$ | async) ? 'over' : 'side'"
-        [opened]="!(isHandset$ | async)"
+        [opened]="!(isHandset$ || isTablet$ | async)"
         position="start">
-        <!-- <app-property-search></app-property-search>
+        <mat-toolbar *ngIf="(isHandset$ || isTablet$ | async)">
+            <span>Tools</span>
+            <span class="example-fill-remaining-space"></span>
+  
+            <button
+            type="button"
+            aria-label="Toggle sidenav"
+            mat-icon-button
+            (click)="toggle(tooldrawer, searchdrawer)" position="end"
+           >
+            <mat-icon aria-label="Side nav toggle icon">close</mat-icon>
+          </button>             
+          </mat-toolbar>
+          <!-- <app-property-search></app-property-search>
         <app-property></app-property> -->
           <app-tools></app-tools>
     </mat-sidenav>
@@ -46,6 +59,20 @@
         [mode]="(isHandset$ | async) ? 'over' : 'side'"
         [opened]="!(isHandset$ | async)"
         position="end">
+        <mat-toolbar *ngIf="(isHandset$ || isTablet$ | async)">
+          <span>Search</span>
+          <span class="example-fill-remaining-space"></span>
+
+          <button
+          type="button"
+          aria-label="Toggle sidenav"
+          mat-icon-button
+          (click)="toggle(searchdrawer, tooldrawer)" position="end"
+         >
+          <mat-icon aria-label="Side nav toggle icon">close</mat-icon>
+        </button>             
+        </mat-toolbar>
+
         <app-property-search></app-property-search>
         <app-property></app-property>
    

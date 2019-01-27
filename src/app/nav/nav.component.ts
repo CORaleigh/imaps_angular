@@ -14,7 +14,10 @@ export class NavComponent {
     .pipe(
       map(result => result.matches)
     );
-
+  isTablet$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Tablet)
+    .pipe(
+      map(result => result.matches)
+    );
   constructor(private breakpointObserver: BreakpointObserver) {}
   mapCenter = [-122.4194, 37.7749];
   basemapType = 'satellite';
@@ -23,5 +26,18 @@ export class NavComponent {
   // See app.component.html
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
+  }
+
+  toggle(thisDrawer, thatDrawer) {
+    
+    thisDrawer.toggle();
+    if (!(this.isTablet$ && this.isHandset$)) {
+      debugger
+      if (thatDrawer.opened) {
+        thatDrawer.toggle();
+  
+      }
+    }
+
   }
 }

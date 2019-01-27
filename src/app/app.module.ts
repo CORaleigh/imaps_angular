@@ -23,6 +23,7 @@ import { MeasureToolComponent } from './measure-tool/measure-tool.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { PrintToolComponent } from './print-tool/print-tool.component';
 import { BookmarksComponent } from './bookmarks/bookmarks.component';
+import { NavtestComponent } from './navtest/navtest.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { BookmarksComponent } from './bookmarks/bookmarks.component';
     MeaasureToolComponent,
     MeasureToolComponent,
     PrintToolComponent,
-    BookmarksComponent
+    BookmarksComponent,
+    NavtestComponent
   ],
   imports: [
     BrowserModule,
