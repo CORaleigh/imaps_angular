@@ -17,13 +17,10 @@ import { PropertyResultsComponent } from './property-results/property-results.co
 import { ToolsComponent } from './tools/tools.component';
 import { SketchToolComponent } from './sketch-tool/sketch-tool.component';
 import { SelectToolComponent } from './select-tool/select-tool.component';
-import { MccColorPickerModule } from 'material-community-components';
-import { MeaasureToolComponent } from './meaasure-tool/meaasure-tool.component';
 import { MeasureToolComponent } from './measure-tool/measure-tool.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { PrintToolComponent } from './print-tool/print-tool.component';
 import { BookmarksComponent } from './bookmarks/bookmarks.component';
-import { NavtestComponent } from './navtest/navtest.component';
 
 @NgModule({
   declarations: [
@@ -37,11 +34,9 @@ import { NavtestComponent } from './navtest/navtest.component';
     ToolsComponent,
     SketchToolComponent,
     SelectToolComponent,
-    MeaasureToolComponent,
     MeasureToolComponent,
     PrintToolComponent,
-    BookmarksComponent,
-    NavtestComponent
+    BookmarksComponent
   ],
   imports: [
     BrowserModule,
@@ -68,10 +63,7 @@ import { NavtestComponent } from './navtest/navtest.component';
     MatFormFieldModule,
     MatCheckboxModule,
     MatButtonToggleModule,
-    ColorPickerModule,
-    MccColorPickerModule.forRoot({
-      used_colors: ['#000000', '#123456', '#777666']
-    }),
+    ColorPickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
