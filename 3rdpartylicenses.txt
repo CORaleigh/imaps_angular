@@ -530,9 +530,6 @@ MIT
 @angular/router
 MIT
 
-@angular/animations
-MIT
-
 @angular/cdk
 MIT
 The MIT License
@@ -583,7 +580,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-@angular/material/tooltip
+@angular/material/toolbar
+
+@angular/animations
+MIT
+
+@angular/material/button
+
+@angular/material/icon
+
+@angular/material/sidenav
+
+@angular/material/tabs
+
+@angular/material/form-field
+
+@angular/forms
+MIT
 
 ngx-color-picker
 MIT
@@ -610,21 +623,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-@angular/material/toolbar
-
-@angular/material/button
-
-@angular/material/icon
-
-@angular/material/sidenav
-
-@angular/material/tabs
-
-@angular/material/form-field
-
-@angular/forms
-MIT
-
 @angular/material/button-toggle
 
 @angular/material/core
@@ -636,6 +634,8 @@ MIT
 @angular/material/sort
 
 @angular/material/table
+
+@angular/material/tooltip
 
 @angular/material/select
 
