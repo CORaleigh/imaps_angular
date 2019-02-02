@@ -1,4 +1,36 @@
-# Imaps
+# iMAPS v4.0.0
+New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS JavaScript API 4.x.
+
+## Whats New?
+
+Layers now all feature layers, rather than map image services.  Faster drawing, added to map as SVG, sharper graphics and labels.
+
+Can now pull in layers from different sources, including local munipalities and ArcGIS Online.
+
+JavaScript API 4.x enables the use of WebGL rendering.
+
+Layers now grouped into categories and subcategories.
+
+Long click or long touch to select a property, no need to open select tool
+
+Property info now grouped in cards, rather than long list
+
+Photos and deeds now integrated into property info.
+
+Streetview removed, now can be accessed in property info.
+
+Tools no longer crammed in corner, there is now a tool side panel
+
+Better support for mobile devices.
+
+
+## Supported Browsers
+
+iMAPS requires a modern browser, Chrome, Firefox, Safari, and Edge
+
+Internet Explorer will not be supported, version 11 may function, but you will not get the full iMAPS experience.  Versions of IE below 11 will not work.
+
+## Angular CLI
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.2.2.
 
