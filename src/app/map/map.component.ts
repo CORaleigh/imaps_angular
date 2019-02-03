@@ -326,11 +326,10 @@ export class MapComponent implements OnInit {
           expanded: false
         });
         legendExpand.watch('expanded', expanded => {
-          //@ts-ignore
-          setTimeout(e => {
-           this.expandPanelExpanded(legendExpand, legend);
-          });
+          this.expandPanelExpanded(expanded, legend);
          });
+        //@ts-ignore
+        disableBodyScroll(legend.domNode);         
         mapView.ui.add(legendExpand, "top-right");                   
         this.shared.mapView.next(mapView);
         let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
@@ -479,12 +478,14 @@ export class MapComponent implements OnInit {
       if (widget.view.widthBreakpoint === 'xsmall') {
         //@ts-ignore
         widget.domNode.style.maxHeight = window.innerHeight - 100 + 'px';
-
+        this.shared.showToolbar = false;
       } else {
         //@ts-ignore
         widget.domNode.style.maxHeight = '-webkit-fill-available';
         //@ts-ignore
       }
+    } else {
+      this.shared.showToolbar = true;
     }
 
 

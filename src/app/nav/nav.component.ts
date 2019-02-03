@@ -20,7 +20,6 @@ export class NavComponent implements OnInit {
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
   }
-  showToolbar:boolean = true;
 
   ngOnInit() {
     this.shared.isHandset$.subscribe(val => {this.isHandset = val});
@@ -48,7 +47,7 @@ export class NavComponent implements OnInit {
 
   hideToolbar(opened) {
     if (this.isHandset) {
-      this.showToolbar = !opened;
+      this.shared.showToolbar = !opened;
     }
   }
   toggle(thisDrawer, thatDrawer) {

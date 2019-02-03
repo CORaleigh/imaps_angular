@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" *ngIf="showToolbar">
+<mat-toolbar color="primary" *ngIf="shared.showToolbar">
 
   <button
     type="button"
@@ -24,11 +24,11 @@
   <!-- <button mat-button *ngIf="!loggedIn" (click)="logInClicked()">Login</button>
   <button mat-button *ngIf="loggedIn" (click)="logOutClicked()">Logout</button> -->
 </mat-toolbar>
-<mat-sidenav-container class="sidenav-container dark-theme" [ngClass]="{'fullHeight': !showToolbar}">
+<mat-sidenav-container class="sidenav-container dark-theme" [ngClass]="{'fullHeight': !shared.showToolbar}">
     <mat-sidenav #tooldrawer class="toolnav sidenav" fixedInViewport="true"
         [attr.role]="(shared.isHandset$ || shared.isTablet$ | async) ? 'dialog' : 'navigation'"
         [mode]="(shared.isHandset$ || shared.isTablet$ | async) ? 'over' : 'side'"
-        [opened]="!(shared.isHandset$ | async) && !(shared.isTablet$ | async)"
+        [opened]="false"
         position="start">
         <mat-toolbar *ngIf="(shared.isHandset$ || shared.isTablet$ | async)">
             <span>Tools</span>
@@ -47,7 +47,7 @@
         <app-property></app-property> -->
           <app-tools></app-tools>
     </mat-sidenav>
-    <mat-sidenav-content [ngClass]="{'fullHeight': !showToolbar}">
+    <mat-sidenav-content [ngClass]="{'fullHeight': !shared.showToolbar}">
         <app-map
         [center]="mapCenter"
         [basemap]="basemapType"

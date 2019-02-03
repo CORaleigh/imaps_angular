@@ -25,6 +25,7 @@ export class SharedService {
   sketchColor:BehaviorSubject<any> = new BehaviorSubject<any>(null);
   sketchTool:esri.Sketch;
   selectTool:esri.Sketch;
+  showToolbar:boolean = true;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
   .pipe(
