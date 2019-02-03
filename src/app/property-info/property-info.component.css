@@ -36,11 +36,13 @@
 
   .mat-card-image {
       max-height: 200px;
+      max-width: 266px;
+
       width: auto;
+      margin-left: 0;
   }
 
   .image-container {
-    text-align: center;
     width: 100%;
     padding: 1em;
   }

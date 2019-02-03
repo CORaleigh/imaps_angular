@@ -142,7 +142,9 @@ export class PropertySearchComponent implements OnInit {
       });         
     }            
   }
-
+  sortPhotos(a,b) {
+    return b.attributes.DATECREATED - a.attributes.DATECREATED;
+  }
   getRelatedRecords(info) {
    this.property.getRelationshipIds(this.condoUrl).subscribe(result => {
       if (result.relationships) {
@@ -151,7 +153,9 @@ export class PropertySearchComponent implements OnInit {
             this.property.getPhotos(this.condoUrl, info.attributes.OBJECTID, relationship.id).subscribe(result => {
               if (result.relatedRecordGroups.length > 0) {
                 if (result.relatedRecordGroups[0].relatedRecords.length > 0) {
-                  this.shared.photos.next(result.relatedRecordGroups[0].relatedRecords);
+                  let photos:any[] = result.relatedRecordGroups[0].relatedRecords;
+                  photos = photos.sort(this.sortPhotos);
+                  this.shared.photos.next(photos);
                 }
               }
             });
