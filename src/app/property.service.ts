@@ -5,12 +5,13 @@ import { HttpParams, HttpHeaders } from '@angular/common/http';
 import { loadModules } from 'esri-loader';
 import esri = __esri;
 import { Observable } from 'rxjs';
+import { SharedService } from './shared.service';
 @Injectable({
   providedIn: 'root'
 })
 export class PropertyService {
 
-  constructor(private http:HttpClient) { }
+  constructor(private http:HttpClient, public shared:SharedService) { }
 
   getRelationshipIds (url:string) {
     let params:HttpParams = new HttpParams()
@@ -83,4 +84,37 @@ export class PropertyService {
 
     return this.http.post<any>(url + '/queryRelatedRecords', params); 
   }    
+
+  queryCondos(url:string, where: string, field: string) {
+    this.getCondos(url + '/query', where, field).subscribe(result => {
+      if (result.features.length === 1) {
+        let feature = result.features[0];
+        this.shared.propertyInfo.next(result.features[0]);
+
+      let data = [feature.attributes];
+      this.shared.propertyResults.next(data);
+
+      } else if (result.features.length > 1) {
+        let data = [];
+        result.features.forEach(feature => {
+          data.push(feature.attributes);
+        });
+        
+        this.shared.propertyResults.next(data);
+      }
+      let oids = []
+      result.features.forEach(feature => {
+        oids.push(feature.attributes.OBJECTID);
+      });
+      this.getProperties(url, oids, 0).subscribe(result => {
+        let oids = [];
+        result.relatedRecordGroups.forEach(rrg => {
+          rrg.relatedRecords.forEach(rr => {
+            oids.push(rr.attributes.OBJECTID);
+          });
+        });
+        this.shared.propertyIds.next(oids);
+      });
+    });
+  }
 }

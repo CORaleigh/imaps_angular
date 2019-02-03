@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { SharedService } from '../shared.service';
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 @Component({
   selector: 'app-property-info',
@@ -15,8 +16,10 @@ export class PropertyInfoComponent implements OnInit {
   @ViewChild('Property') private propertyEl: ElementRef;
   @ViewChild('Ownership') private ownerEl: ElementRef;
   @ViewChild('Deeds') private deedEl: ElementRef;
+  @ViewChild('propertyInfo') private infoEl: ElementRef;
 
   ngOnInit() {
+    disableBodyScroll(this.infoEl.nativeElement);
     this.shared.propertyInfo.subscribe(info => {
       if (info) {
         this._info = info;

@@ -1,11 +1,30 @@
-.sidenav-container {
-  height: calc(100% - 56px);
+
+.mat-sidenav-content.fullHeight {
+  height: 100%;
 }
 
 
+/* .mat-sidenav-container{
+  height: 100%;
+}
+ */
+
+.mat-sidenav-content {
+  height: 100%;
+}
+
+.mat-sidenav-container{
+  height: calc(100% - 56px);
+}
+
+.mat-sidenav-container.fullHeight{
+  height: calc(100%);
+}
+
 
 @media only screen and (min-width: 768px) {
-  .sidenav-container {
+
+  .mat-sidenav-container{
     height: calc(100% - 64px);
   }
   
@@ -16,6 +35,10 @@
   padding:1em;  
   max-width: 100%;
 
+}
+
+.mat-drawer.mat-drawer-side {
+  z-index: 1;
 }
 
 
@@ -44,8 +67,7 @@
 .mat-toolbar.mat-primary {
   position: sticky;
   top: 0;
-  z-index: 1;
-  overflow: hidden;
+  z-index: 0;
 }
 
 .mat-drawer-container {

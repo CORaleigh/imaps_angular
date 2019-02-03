@@ -5,3 +5,7 @@
 .esri-view {
   height: 100%;
 }
+
+.clear-button>.esri-icon::before {
+  content: "\e677" !important;
+}

@@ -21,6 +21,7 @@ import { MeasureToolComponent } from './measure-tool/measure-tool.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { PrintToolComponent } from './print-tool/print-tool.component';
 import { BookmarksComponent } from './bookmarks/bookmarks.component';
+import { AppsComponent } from './apps/apps.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { BookmarksComponent } from './bookmarks/bookmarks.component';
     SelectToolComponent,
     MeasureToolComponent,
     PrintToolComponent,
-    BookmarksComponent
+    BookmarksComponent,
+    AppsComponent
   ],
   imports: [
     BrowserModule,

@@ -17,7 +17,9 @@ import esri = __esri;
 import { SharedService } from '../shared.service';
 import { PropertyService } from '../property.service';
 import { Expression, isNgTemplate } from '@angular/compiler';
-
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+import { ActivatedRoute, Router } from '@angular/router';
+import '../modernizr.js';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
@@ -27,11 +29,7 @@ export class MapComponent implements OnInit {
 
   @Output() mapLoaded = new EventEmitter<boolean>();
   @ViewChild('mapViewNode') private mapViewEl: ElementRef;
-  private sketchEl: ElementRef;
-  private selectEl: ElementRef;
-  private bufferDistance: number;
-  private select:esri.Sketch;
-  private sketchColor: string;
+
 
   /**
    * @private _zoom sets map zoom
@@ -45,7 +43,10 @@ export class MapComponent implements OnInit {
   private _center: Array<number> = [0.1278, 51.5074];
   private _basemap: string = 'streets';
   private _propertyLayer:esri.FeatureLayer;
-  
+  private isTablet:boolean;
+  private isHandset:boolean;
+  private _layerList:esri.LayerList;
+  private _basemapGallery:esri.BasemapGallery;
 
   @Input()
   set zoom(zoom: number) {
@@ -74,11 +75,13 @@ export class MapComponent implements OnInit {
     return this._basemap;
   }
 
-  constructor(public shared:SharedService, private property:PropertyService) { }
-
+  constructor(public shared:SharedService, private property:PropertyService, private router:Router, private route: ActivatedRoute) { }
+  createWidget() {
+    
+  }
   async initializeMap() {
     try {
-      const [WebMap, MapView, config, SimpleFillSymbol, Graphic, GraphicsLayer, GroupLayer, ScaleBar, Fullscreen, Track, Compass, BasemapGallery, LayerList, Search, Expand, Collection] = await loadModules([
+      const [WebMap, MapView, config, SimpleFillSymbol, Graphic, GraphicsLayer, GroupLayer, ScaleBar, Fullscreen, Track, Compass, BasemapGallery, LayerList, Legend, Home, Search, Expand, Collection] = await loadModules([
         'esri/WebMap',
         'esri/views/MapView',
         'esri/config',
@@ -93,6 +96,8 @@ export class MapComponent implements OnInit {
         "esri/widgets/Compass",
         "esri/widgets/BasemapGallery",
         "esri/widgets/LayerList",
+        "esri/widgets/Legend",
+        "esri/widgets/Home",
         "esri/widgets/Search",
         "esri/widgets/Expand",
         "esri/core/Collection"  
@@ -121,10 +126,10 @@ export class MapComponent implements OnInit {
       let defineLayerListActions = function (event) {
 
         if (event.item.layer.type != 'group') {
-          event.item.panel = {
-            content: "legend",
-            open: false
-          };
+          // event.item.panel = {
+          //   content: "legend",
+          //   open: false
+          // };
           event.item.actionsSections = [
             [{
               title: "Increase opacity",
@@ -143,6 +148,8 @@ export class MapComponent implements OnInit {
       // Now execute additional processes
       mapView.when(() => { 
         let i = 0;
+        let groupLayer:esri.GroupLayer;
+
         do  {
           let layer = mapView.map.layers.getItemAt(i);
             if (layer.title.indexOf(' - ') > -1 && layer.type === 'feature') {
@@ -154,7 +161,7 @@ export class MapComponent implements OnInit {
                 i--;
 
               } else {
-                let groupLayer:esri.GroupLayer = new GroupLayer({title: groupId, id: groupId});
+                groupLayer = new GroupLayer({title: groupId, id: groupId});
                 layer.title = layer.title.replace(groupId + ' - ', '');
                 mapView.map.add(groupLayer);
 
@@ -163,16 +170,55 @@ export class MapComponent implements OnInit {
               }
 
         } i++;} while (i < mapView.map.layers.length - 1);
+      
         this.mapLoaded.emit(true);
+        mapView.popup.watch('collapsed', collapsed => {
+          if (!collapsed) {
+            setTimeout(e=> {
+            let elms = document.getElementsByClassName('esri-popup__content');
+            if (elms.length) {
+              disableBodyScroll(elms[0]);
+            }
+          },2000);
+     
+          }
+        });
+
         let scale:esri.ScaleBar = new ScaleBar({view:mapView});
         mapView.ui.add(scale, "bottom-left");
-        let full:esri.Fullscreen = new Fullscreen({view:mapView});
-        mapView.ui.add(full, "top-left");
-        let track:esri.Track = new Track({view:mapView});
-        mapView.ui.add(track, "top-left");
+        if (Modernizr.fullscreen) {
+          let full:esri.Fullscreen = new Fullscreen({view:mapView});
+          mapView.ui.add(full, "top-left");
+        }
+        if (Modernizr.geolocation) {
+          let track:esri.Track = new Track({view:mapView});
+          mapView.ui.add(track, "top-left");
+        }
         let compass:esri.Compass = new Compass({view:mapView});
         mapView.ui.add(compass, "top-left");    
+        let clear:esri.Home = new Home({view:mapView});
+        clear.goToOverride = (view, params) => {
+          view.map.layers.forEach(layer => {
+            if (layer.type === 'graphics') {
+              (layer as esri.GraphicsLayer).removeAll();
+            }
+          });
+          this.shared.propertyInfo.next(null);
+          this.shared.propertyResults.next([]);
+          return null;
+        };
         
+        mapView.ui.add(clear, "top-left");    
+          //@ts-ignore
+          clear.domNode.classList.add('clear-button');        
+        setTimeout( () => {
+          //@ts-ignore
+          clear.domNode.setAttribute('aria-label', 'Clear graphics and selection');
+          //@ts-ignore
+
+          clear.domNode.setAttribute('title', 'Clear graphics and selection');
+
+        }, 500);
         let searchWidget:esri.widgetsSearch = new Search({
           view: mapView
         });
@@ -180,7 +226,7 @@ export class MapComponent implements OnInit {
         // the top left corner of the view
         mapView.ui.add(searchWidget, "top-right");
 
-        let basemap:esri.BasemapGallery = new BasemapGallery(
+        this._basemapGallery = new BasemapGallery(
           {view:mapView,
             container: document.createElement("div"),
           });
@@ -188,22 +234,43 @@ export class MapComponent implements OnInit {
             view: mapView, 
             expandIconClass: "esri-icon-basemap",
             //@ts-ignore
-            content: basemap.domNode}
-          )          
+            content: this._basemapGallery.domNode}
+          );          
+           //@ts-ignore
+           disableBodyScroll(this._basemapGallery.domNode);   
+           expand.watch('expanded', expanded => {
+            //@ts-ignore
+             this.expandPanelExpanded(expanded, this._basemapGallery);
+           });
+
+          
+          
         mapView.ui.add(expand, "top-right");   
 
-        let layerList:esri.LayerList = new LayerList(
+
+        this._layerList = new LayerList(
           {view:mapView,
             container: document.createElement("div"),
             listItemCreatedFunction: defineLayerListActions
           });
+
         expand = new Expand({
             view: mapView, 
-            expandIconClass: "esri-icon-layer-list",
+            expandIconClass: "esri-icon-layers",
             //@ts-ignore
-            content: layerList.domNode}
+            content:  this._layerList.domNode}
           );
-          layerList.on("trigger-action", function(event) {
+
+          expand.watch('expanded', expanded => {
+            //@ts-ignore
+             this.expandPanelExpanded(expanded, this._layerList);
+           });
+
+
+           //@ts-ignore
+          disableBodyScroll(this._layerList.domNode);
+
+          this._layerList.on("trigger-action", function(event) {
 
             // Capture the action id.
             var id = event.action.id;
@@ -244,7 +311,27 @@ export class MapComponent implements OnInit {
               }
             }
           });
-        mapView.ui.add(expand, "top-right");                  
+        mapView.ui.add(expand, "top-right");  
+        const legend:esri.Legend = new Legend({
+          view: mapView,
+          style: "classic",
+          container: document.createElement("div"),            
+        })
+        const legendExpand:esri.Expand = new Expand({
+                   //@ts-ignore
+          content: legend.domNode,
+          view: mapView,
+          expandIconClass: "esri-icon-layer-list",
+
+          expanded: false
+        });
+        legendExpand.watch('expanded', expanded => {
+          //@ts-ignore
+          setTimeout(e => {
+           this.expandPanelExpanded(legendExpand, legend);
+          });
+         });
+        mapView.ui.add(legendExpand, "top-right");                   
         this.shared.mapView.next(mapView);
         let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
         let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics', listMode: 'hide'});
@@ -261,6 +348,21 @@ export class MapComponent implements OnInit {
           if (layer.title.indexOf('Property') > -1) {
             mapView.whenLayerView(layer).then((layerView: esri.FeatureLayerView) => {
               this._propertyLayer = layerView.layer;
+              if (this.route.routeConfig) {
+                if (this.route.routeConfig.path === 'pin/:pin') { 
+                  this.route.paramMap.subscribe(params => {
+                    let url:string = '';
+                  //@ts-ignore
+                  mapView.map.tables.forEach(table => {
+                    if (table.title.indexOf('Condos') > -1) {
+                      url = table.url;
+                    }
+                  });        
+                  this.property.queryCondos(url, "PIN_NUM IN ('" + params.get('pin') + "')",'PIN_NUM');
+
+                  });  
+                }
+              }            
               mapView.on('hold', e => {
                 let geometry = e.mapPoint;
                 this._propertyLayer.queryFeatures({geometry: geometry, returnGeometry: true, outFields: ['OBJECTID']}).then(result => {
@@ -272,6 +374,7 @@ export class MapComponent implements OnInit {
                   this.shared.propertyIds.next(oids);
                   singleGraphics.removeAll();
                   multiGraphics.removeAll();
+                  (mapView.map.findLayerById('selectGraphics') as esri.GraphicsLayer).removeAll();
                   if (geometry) {
                     singleGraphics.add(new Graphic({geometry:geometry, symbol: {
                       type: 'simple-fill',
@@ -292,10 +395,11 @@ export class MapComponent implements OnInit {
                         });
                       }
                     });
+                    
                     this.shared.propertyResults.next(data);
                     if (data.length === 1) {
                       this.shared.propertyInfo.next({attributes: data[0]});
-                    }
+                    } 
                   });
             
                   });
@@ -367,26 +471,36 @@ export class MapComponent implements OnInit {
 
   }
 
+  expandPanelExpanded(expanded, widget) {
+    
+    //@ts-ignore
+    if (expanded && widget.view) {
+    //@ts-ignore      
+      if (widget.view.widthBreakpoint === 'xsmall') {
+        //@ts-ignore
+        widget.domNode.style.maxHeight = window.innerHeight - 100 + 'px';
 
+      } else {
+        //@ts-ignore
+        widget.domNode.style.maxHeight = '-webkit-fill-available';
+        //@ts-ignore
+      }
+    }
+
+
+  }
  
 
   ngOnInit() {
-    this.initializeMap();
-    this.shared.sketchEl.subscribe(el => {
-      if (el) {
-        this.sketchEl = el;
-      }
+    disableBodyScroll(this.mapViewEl.nativeElement);
+    this.shared.isHandset$.subscribe(val => {
+      this.isHandset = val;
     });
-    this.shared.selectEl.subscribe(el => {
-      if (el) {
-        this.selectEl = el;
-      }
+    this.shared.isHandset$.subscribe(val => {
+      this.isTablet = val;
     });    
-    this.shared.bufferDistance.subscribe(distance => {
-      
-        this.bufferDistance = distance;
-
-    });        
+    this.initializeMap();
+     
 
 }
 

@@ -1,4 +1,4 @@
-<div class="infoContainer">
+<div #propertyInfo class="infoContainer">
         <!-- <mat-form-field>
                 <mat-select placeholder="Scroll To Section" (selectionChange)="scroll($event.value)">
                   <mat-option *ngFor="let section of sections" [value]="section">
@@ -230,7 +230,7 @@
         </div>            
         </mat-card-content>      
         <mat-card-actions *ngIf="_deeds.length > 0">
-                <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM)">View Deed</button>
+                <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM+'&RecordDate=')">View Deed</button>
                 <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.BOM_DOC_NUM+'&RecordDate=')">View Plat</button>
               </mat-card-actions>
         </mat-card>     

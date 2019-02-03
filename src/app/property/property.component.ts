@@ -12,7 +12,7 @@ export class PropertyComponent implements OnInit {
   selectedIndex:number = 0;
   ngOnInit() {
     // this.shared.propertyResults.subscribe(results => {
-    //   debugger
+    //   
     //   if (results.length === 1) {
     //     this.selectedIndex = 1;
     //   } else {
@@ -27,6 +27,11 @@ export class PropertyComponent implements OnInit {
         this.selectedIndex = 0;
       }
     });    
+    this.shared.propertyResults.subscribe(results => {
+      if (results.length > 1) {
+        this.selectedIndex = 0;
+      }
+    });        
   }
 
 }

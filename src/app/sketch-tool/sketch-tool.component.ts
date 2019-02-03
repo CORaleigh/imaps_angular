@@ -31,6 +31,13 @@ export class SketchToolComponent implements OnInit {
       let layer:esri.GraphicsLayer = new GraphicsLayer({title: 'sketchGraphics', listMode: 'hide'});
       this._mapView.map.add(layer);
       let sketch:esri.Sketch = new Sketch({layer:layer, view: this._mapView, container:this.sketchEl.nativeElement});
+      this.shared.sketchTool = sketch;
+      sketch.watch('activeTool', tool => {
+        if (['point','polyline','polygon','circle','rectangle'].indexOf(tool) > -1) {
+          
+          this.shared.selectTool.reset();
+        }
+      });      
       sketch.on('create', (event) => {
         if (event)
 

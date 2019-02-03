@@ -1,8 +1,11 @@
-<div class="searchContainer">
+<div  class="searchContainer">
 <form [formGroup]="searchForm">
   <mat-form-field class="example-full-width">
-      <input (input)="inputChanged($event)" matInput placeholder="Address, owner, PIN, REID, or street"  formControlName="searchGroup" [formControl]="control" [matAutocomplete]="searchGroup">
-      <mat-autocomplete #searchGroup="matAutocomplete" (optionSelected)="accountSelected($event)" [displayWith]="displayFn">
+      <input #textInput (input)="inputChanged($event)" matInput placeholder="Address, owner, PIN, REID, or street"  formControlName="searchGroup" [formControl]="control" [matAutocomplete]="searchGroup">
+      <button mat-button *ngIf="control.value"  matSuffix mat-icon-button aria-label="Clear" (click)="control.setValue('')">
+        <mat-icon>close</mat-icon>
+      </button>      
+      <mat-autocomplete #autoComplete  #searchGroup="matAutocomplete" (optionSelected)="accountSelected($event)" [displayWith]="displayFn">
       <mat-optgroup *ngFor="let group of searchGroups" [label]="group.type">
           <mat-option *ngFor="let value of group.values" [value]="value">
           

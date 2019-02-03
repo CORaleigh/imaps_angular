@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; overflow:hidden; margin: 0 }
+html, body { height: 100%;margin: 0;} /*position: fixed; top:0; bottom: 0;left: 0;right: 0; z-index: 1;}*/
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-autocomplete-panel {
     max-height: 500px !important;
@@ -22,6 +22,43 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     width: auto !important;
 }
 
-app-nav {
-    overflow: hidden;
+.mat-paginator-container {
+    flex-wrap: nowrap !important;
 }
+
+app-select-tool .esri-sketch__section.esri-sketch__tool-section:first-child {
+    display: none !important;
+}
+
+app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
+    display: none !important;
+}
+
+.esri-legend__layer-body {
+    display: flex;
+    flex-flow: wrap;
+    margin:0 !important;
+  }
+  
+  .esri-legend__layer-row {
+    flex: 50%;
+  }
+  
+
+  .esri-layer-list-panel {
+    margin:0 !important;
+ 
+  }
+
+  .esri-legend__layer {
+    margin:0 !important;
+
+  }
+
+  .esri-layer-list__list {
+      margin:0 !important;
+  }
+
+  .clear-button>.esri-icon::before {
+    content: "\e677" !important;
+  }

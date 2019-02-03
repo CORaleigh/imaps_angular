@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MatPaginator, MatSort } from '@angular/material';
 import { PropertyResultsDataSource } from './property-results-datasource';
 import { SharedService } from '../shared.service';
 import { SelectionModel } from '@angular/cdk/collections';
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 @Component({
   selector: 'app-property-results',
@@ -12,6 +13,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 export class PropertyResultsComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('resultTable') private tableEl: ElementRef;
+
   dataSource: PropertyResultsDataSource;
   constructor(private shared:SharedService) {}
   selection:SelectionModel<any> = new SelectionModel<any>(false, []);    
@@ -22,9 +25,19 @@ export class PropertyResultsComponent implements OnInit {
     this.shared.propertyInfo.next({attributes: row});
   };
   ngOnInit() {
+   // disableBodyScroll(this.tableEl.nativeElement);
     this.dataSource = new PropertyResultsDataSource(this.paginator, this.sort, []);
     this.shared.propertyResults.subscribe(data => {
-      if (data.length) {
+      if (data) {
+        this.paginator.firstPage();
+        if (document.getElementsByClassName('table-container').length) {
+          disableBodyScroll(document.getElementsByClassName('table-container')[0]);
+
+        } if (this.shared.mapView.getValue()) {
+          if (this.shared.mapView.getValue().map.findLayerById('selectGraohics')) {
+            (this.shared.mapView.getValue().map.findLayerById('selectGraohics') as __esri.GraphicsLayer).removeAll();
+          }
+        }
         this.dataSource = new PropertyResultsDataSource(this.paginator, this.sort, data);
       }
     });   

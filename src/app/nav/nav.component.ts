@@ -1,43 +1,67 @@
-import { Component } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { SharedService } from '../shared.service';
+import { MatDrawer } from '@angular/material';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css']
 })
-export class NavComponent {
-
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(result => result.matches)
-    );
-  isTablet$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Tablet)
-    .pipe(
-      map(result => result.matches)
-    );
-  constructor(private breakpointObserver: BreakpointObserver) {}
+export class NavComponent implements OnInit {
+  private isHandset:boolean;
+  private isTablet:boolean;
+  @ViewChild('searchdrawer') private searchDrawer: MatDrawer;
+  constructor(public shared:SharedService){}
   mapCenter = [-122.4194, 37.7749];
   basemapType = 'satellite';
   mapZoomLevel = 12;
-
+  drawerOpen:boolean = false;
   // See app.component.html
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
   }
+  showToolbar:boolean = true;
 
+  ngOnInit() {
+    this.shared.isHandset$.subscribe(val => {this.isHandset = val});
+    this.shared.isTablet$.subscribe(val => {this.isTablet = val});
+
+    this.shared.propertyInfo.subscribe(info => {
+      if (info) {
+        this.searchDrawer.open();
+        this.hideToolbar(true);
+        this.drawerOpen = true;
+
+      }
+    });
+    this.shared.propertyResults.subscribe(results => {
+      if (results) {
+        if (results.length > 0) {
+          this.searchDrawer.open();
+          this.hideToolbar(true);
+          this.drawerOpen = true;
+
+        }
+      }
+    });
+  }
+
+  hideToolbar(opened) {
+    if (this.isHandset) {
+      this.showToolbar = !opened;
+    }
+  }
   toggle(thisDrawer, thatDrawer) {
     
     thisDrawer.toggle();
-    if (!(this.isTablet$ && this.isHandset$)) {
-      debugger
+    if (this.isTablet || this.isHandset) {
       if (thatDrawer.opened) {
         thatDrawer.toggle();
   
       }
     }
+    this.hideToolbar(thisDrawer.opened);
+
 
   }
 }

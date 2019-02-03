@@ -42,11 +42,11 @@ export class SelectToolComponent implements OnInit {
         "esri/Color"
 
       ]);
-      let layer:esri.GraphicsLayer = new GraphicsLayer({title: 'selectGraphics', listMode: 'hide'});
+      let layer:esri.GraphicsLayer = new GraphicsLayer({id: 'selectGraphics', title: 'selectGraphics', listMode: 'hide'});
       this._mapView.map.add(layer);
       this._mapView.map.allLayers.forEach(l => { 
         if (l.title) {
-          if (l.title.indexOf('Property') > -1) {
+          if (l.title === 'Property') {
             this._propertyLayer = l as esri.FeatureLayer;
           }
         }
@@ -54,8 +54,15 @@ export class SelectToolComponent implements OnInit {
       });
       
         this._select = new Sketch({layer:layer, view: this._mapView, container:this.selectEl.nativeElement});
-      //mapView.ui.add(sketch, 'top-right');
-      this._select.on('create', (event) => {
+        this._select.watch('activeTool', tool => {
+          
+          if (['point','polyline','polygon','circle','rectangle'].indexOf(tool) > -1) {
+            
+            this.shared.sketchTool.reset();
+          }
+        });
+        this.shared.selectTool = this._select;
+        this._select.on('create', (event) => {
         if (event.state === 'complete' ) {
           this.selectCompleted(event, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
   
@@ -94,6 +101,7 @@ export class SelectToolComponent implements OnInit {
 
     }
     event.graphic.symbol = symbol;
+ 
     propertyLayer.queryFeatures({geometry: geometry, returnGeometry: true, outFields: ['OBJECTID']}).then(result => {
       let oids = [];
       result.features.forEach(feature => {

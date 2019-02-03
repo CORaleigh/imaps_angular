@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { PropertyService } from '../property.service';
@@ -6,6 +6,8 @@ import { SharedService } from '../shared.service';
 import { loadModules } from 'esri-loader';
 import esri = __esri;
 import { map } from 'rxjs/operators';
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+
 export interface SearchGroup {
   type:string,
   values: string[];
@@ -32,6 +34,9 @@ export class PropertySearchComponent implements OnInit {
   control: FormControl = new FormControl();
   accountList: any[] = [];
   searchGroups:SearchGroup[] = [{type:'Address', values:[]},{type:'Owner', values:[]},{type:'PIN', values:[]},{type:'REID', values:[]},{type:'Street', values:[]}];
+  @ViewChild('autoComplete') private autoEl: ElementRef;
+
+
   displayFn(attributes?: any): string | undefined {
     let value = undefined;
     if (attributes) {
@@ -52,6 +57,8 @@ export class PropertySearchComponent implements OnInit {
   }
 
   ngOnInit() {
+   disableBodyScroll(this.autoEl.nativeElement);
+
     this.shared.mapView.subscribe(mapView => {
       if (mapView) {
         this.mapView = mapView;
@@ -69,7 +76,9 @@ export class PropertySearchComponent implements OnInit {
     this.shared.propertyInfo.subscribe(info => {
       if (info) {
         this.getRelatedRecords(info);
-
+        this.searchGroups.forEach(sg => {
+          sg.values = [];
+        });
       }
     });
   }
@@ -86,6 +95,10 @@ export class PropertySearchComponent implements OnInit {
  
    inputChanged(event) {
     if (event.target.value.length > 4) {
+      
+      if (document.getElementsByClassName('mat-autocomplete-panel').length) {
+        disableBodyScroll(document.getElementsByClassName('mat-autocomplete-panel')[0]);
+      }      
       this.searchGroups[0].values=[];
       this.searchGroups[1].values=[];
       this.searchGroups[2].values=[];           
@@ -174,6 +187,11 @@ export class PropertySearchComponent implements OnInit {
         
         this.shared.propertyResults.next(data);
       }
+
+      this.searchGroups.forEach(sg => {
+        sg.values = [];
+      });      
+      
       let oids = []
       result.features.forEach(feature => {
         oids.push(feature.attributes.OBJECTID);
@@ -193,6 +211,11 @@ export class PropertySearchComponent implements OnInit {
   accountSelected(event) {
     let where = '';
     let field = '';
+    this.searchGroups.forEach(sg => {
+      sg.values = [];
+    });
+    
+
     switch (event.option.group.label) {
       case 'Address': 
         field = 'PIN_NUM';
@@ -216,6 +239,7 @@ export class PropertySearchComponent implements OnInit {
         break;                 
     }
 
-    this.getCondos(where, field);
+    //this.getCondos(where, field);
+    this.property.queryCondos(this.condoUrl, where, field);
   }
 }
