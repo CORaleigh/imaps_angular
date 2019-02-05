@@ -643,6 +643,8 @@ SOFTWARE.
 
 @angular/material/card
 
+@angular/cdk/scrolling
+
 zone.js
 MIT
 The MIT License
