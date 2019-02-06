@@ -9,14 +9,16 @@ import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'bo
 })
 export class PropertyInfoComponent implements OnInit {
    _info:any;
-   _photos:any[];
    _deeds:any[];
   sections:string[] = ['Property', 'Ownership', 'Deeds'];
+
+  
   constructor(private shared:SharedService) { }
   @ViewChild('Property') private propertyEl: ElementRef;
   @ViewChild('Ownership') private ownerEl: ElementRef;
   @ViewChild('Deeds') private deedEl: ElementRef;
   @ViewChild('propertyInfo') private infoEl: ElementRef;
+  SWIPE_ACTION = { LEFT: 'swipeleft', RIGHT: 'swiperight' };
 
   ngOnInit() {
     disableBodyScroll(this.infoEl.nativeElement);
@@ -25,11 +27,7 @@ export class PropertyInfoComponent implements OnInit {
         this._info = info;
       }
     });
-    this.shared.photos.subscribe(photos => {
-      if (photos) {
-        this._photos = photos;
-      }
-    });    
+
     this.shared.deeds.subscribe(deeds => {
       if (deeds) {
         this._deeds = deeds;
@@ -56,4 +54,5 @@ export class PropertyInfoComponent implements OnInit {
       this.deedEl.nativeElement.scrollIntoView();
     }
   }
+
 }

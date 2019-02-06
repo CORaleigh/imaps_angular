@@ -7,16 +7,13 @@
                 </mat-select>
               </mat-form-field>   -->
         <div #Property>
-
  
         <mat-card  class="example-card">
                 <mat-card-header>
                   <mat-card-title>Property</mat-card-title>
                 </mat-card-header>
-                <div class="image-container" *ngIf="_photos.length > 0">
-                    <img mat-card-image src="http://services.wakegov.com/realestate/photos/mvideo/{{_photos[0].attributes.IMAGEDIR}}/{{_photos[0].attributes.IMAGENAME}}">
-                </div>
 
+                <app-photo-gallery [cardWidth]="propertyInfo.offsetWidth"></app-photo-gallery>
                 <mat-card-content>
                     <div class="row" *ngIf="_info">
                         <div class="col">
@@ -230,7 +227,7 @@
         </div>            
         </mat-card-content>      
         <mat-card-actions *ngIf="_deeds.length > 0">
-                <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM+'&RecordDate=')">View Deed</button>
+                <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM)">View Deed</button>
                 <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.BOM_DOC_NUM+'&RecordDate=')">View Plat</button>
               </mat-card-actions>
         </mat-card>     

@@ -28,21 +28,27 @@
   }
 
   .mat-card {
-      margin-left: 4px;
-      margin-right: 4px;
-      margin-top: 1em;
-      margin-bottom: 1em;
+    padding:0;
   }
 
-  .mat-card-image {
+  /* .mat-card-image {
       max-height: 200px;
       max-width: 266px;
 
-      width: auto;
+      width: 266px;
       margin-left: 0;
-  }
+  } */
 
-  .image-container {
-    width: 100%;
-    padding: 1em;
-  }
+  
+
+
+.mat-card-header {
+    padding-top: 16px;
+}
+.mat-card-actions {
+    padding: 16px;
+}
+
+.mat-card-content {
+    padding: 16px;
+}

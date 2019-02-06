@@ -8,9 +8,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .mat-tab-body-wrapper {
     height: 100% !important;
-
+    overflow:hidden;
 }
 
+  
+.cdk-virtual-scroll-content-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+  }
 
 .mat-tab-body {
     overflow-x: hidden;
@@ -62,3 +67,6 @@ app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
   .clear-button>.esri-icon::before {
     content: "\e677" !important;
   }
+  .mat-sidenav-container, .mat-sidenav-content, .mat-tab-body-content {
+    transform: none !important;
+}

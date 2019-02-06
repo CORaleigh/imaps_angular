@@ -22,6 +22,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { PrintToolComponent } from './print-tool/print-tool.component';
 import { BookmarksComponent } from './bookmarks/bookmarks.component';
 import { AppsComponent } from './apps/apps.component';
+import { PhotoGalleryComponent } from './photo-gallery/photo-gallery.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [
@@ -38,7 +40,8 @@ import { AppsComponent } from './apps/apps.component';
     MeasureToolComponent,
     PrintToolComponent,
     BookmarksComponent,
-    AppsComponent
+    AppsComponent,
+    PhotoGalleryComponent
   ],
   imports: [
     BrowserModule,
@@ -65,7 +68,8 @@ import { AppsComponent } from './apps/apps.component';
     MatFormFieldModule,
     MatCheckboxModule,
     MatButtonToggleModule,
-    ColorPickerModule
+    ColorPickerModule,
+    ScrollingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

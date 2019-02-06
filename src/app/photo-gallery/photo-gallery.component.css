@@ -1,0 +1,52 @@
+.image-container {
+  /* So the sliding bit doesn't stick out. */
+    -webkit-transition:all 1.0s ease-in-out;
+    -moz-transition:all 1.0s ease-in-out;
+    -o-transition:all 1.0s ease-in-out;
+    transition:all 1.0s ease-in-out;
+
+  }
+
+  .photo-button {
+      position: absolute;
+      background-color: rgba(0,0,0,.4) !important;
+  }
+  .photo-button-back {
+    margin-top: 95px;
+    margin-left: 5px;
+    float: left;
+    z-index: 100;
+}
+  .photo-button-next {
+    margin-left: 320px;
+    margin-top: 95px;
+    float: right;
+    z-index: 100;
+
+}
+
+
+
+
+.mat-card-image {
+
+    /* float:left; */
+    height: auto;
+    vertical-align: middle;    
+    margin:0;
+}
+
+
+.mat-card-image.current { 
+    opacity: 1;
+
+
+}
+.example-item {
+    height: 100%;
+    writing-mode: vertical-lr;
+}
+
+.example-viewport {
+    overflow: hidden;
+}
