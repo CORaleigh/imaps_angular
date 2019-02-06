@@ -26,6 +26,7 @@ export class SharedService {
   sketchTool:esri.Sketch;
   selectTool:esri.Sketch;
   showToolbar:boolean = true;
+  propertyTabIndex:number = 0;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
   .pipe(

@@ -14,22 +14,22 @@ export class PropertyComponent implements OnInit {
     // this.shared.propertyResults.subscribe(results => {
     //   
     //   if (results.length === 1) {
-    //     this.selectedIndex = 1;
+    //     this.shared.propertyTabIndex  = 1;
     //   } else {
-    //     this.selectedIndex = 0;
+    //     this.shared.propertyTabIndex  = 0;
     //   }
     // });
     this.shared.propertyInfo.subscribe(info => {
-      this.selectedIndex = 0;
+      this.shared.propertyTabIndex = 0;
       if (info) {
-        this.selectedIndex = 1;
+        this.shared.propertyTabIndex  = 1;
       } else {
-        this.selectedIndex = 0;
+        this.shared.propertyTabIndex  = 0;
       }
     });    
     this.shared.propertyResults.subscribe(results => {
       if (results.length > 1) {
-        this.selectedIndex = 0;
+        this.shared.propertyTabIndex  = 0;
       }
     });        
   }
