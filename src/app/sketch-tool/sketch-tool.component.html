@@ -4,3 +4,10 @@
 <mat-form-field class="example-full-width">
   <input matInput placeholder="Outline Width (px)" type="number" [(ngModel)]="width" >
 </mat-form-field>
+<p></p>
+<div *ngIf="activeTool != 'polyline'">
+  <mat-form-field class="example-full-width"  >
+    <textarea matInput placeholder="Label" type="text" [(ngModel)]="label" ></textarea>
+  </mat-form-field>
+</div>
+{{activeTool}}
