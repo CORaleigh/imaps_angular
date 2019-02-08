@@ -70,3 +70,16 @@ app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
   .mat-sidenav-container, .mat-sidenav-content, .mat-tab-body-content {
     transform: none !important;
 }
+.esri-icon-visible {
+  color: #4c8c2b !important;
+
+}
+.esri-icon-visible:before {
+  content: "\e611" !important;
+  color: inherit;
+}
+
+.esri-icon-non-visible:before {
+  content: "\e610" !important;
+  color: inherit;
+}

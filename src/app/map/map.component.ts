@@ -147,29 +147,7 @@ export class MapComponent implements OnInit {
       // All resources in the MapView and the map have loaded.
       // Now execute additional processes
       mapView.when(() => { 
-        let i = 0;
-        let groupLayer:esri.GroupLayer;
-
-        do  {
-          let layer = mapView.map.layers.getItemAt(i);
-            if (layer.title.indexOf(' - ') > -1 && layer.type === 'feature') {
-              let groupId = layer.title.substr(0, layer.title.indexOf(' - '));
-              layer.title = layer.title.replace(groupId + ' - ', '');
-              if (mapView.map.findLayerById(groupId)) {
-                
-                (mapView.map.findLayerById(groupId) as esri.GroupLayer).add(layer);
-                i--;
-
-              } else {
-                groupLayer = new GroupLayer({title: groupId, id: groupId});
-                layer.title = layer.title.replace(groupId + ' - ', '');
-                mapView.map.add(groupLayer);
-
-                groupLayer.add(layer);
-                i--;
-              }
-
-        } i++;} while (i < mapView.map.layers.length - 1);
+        this.groupLayers(mapView, GroupLayer);
       
         this.mapLoaded.emit(true);
         mapView.popup.watch('collapsed', collapsed => {
@@ -468,6 +446,65 @@ export class MapComponent implements OnInit {
       console.log('We have an error: ' + error);
     }
 
+  }
+
+  groupLayers(mapView, GroupLayer) {
+    let i = 0;
+    let groupLayer:esri.GroupLayer;
+    let subLayer:esri.GroupLayer;
+    do  {
+      let layer = mapView.map.layers.getItemAt(i);
+      let levels = layer.title.split(' - ').length
+      if (levels > 0 && layer.type === 'feature') {
+        let groupId = layer.title.substr(0, layer.title.indexOf(' - '));
+        layer.title = layer.title.replace(groupId + ' - ', '');
+        if (mapView.map.findLayerById(groupId)) {
+
+        } else {
+          groupLayer = new GroupLayer({title: groupId, id: groupId});
+          mapView.map.add(groupLayer);
+        }
+        if (layer.title.indexOf(' - ') > -1) {
+          let subId = layer.title.substr(0, layer.title.indexOf(' - '));
+          layer.title = layer.title.replace(subId + ' - ', '');
+          if (mapView.map.findLayerById(subId)) {
+            mapView.map.findLayerById(subId).add(layer);
+            i--;
+          } else {
+            subLayer = new GroupLayer({title: subId, id: subId});
+            subLayer.add(layer);
+            mapView.map.findLayerById(groupId).add(subLayer);
+            i--;
+          }
+
+
+        } else {
+          groupLayer.add(layer);
+          i--;
+
+        }
+      // }
+
+
+      //   if (layer.title.indexOf(' - ') > -1 && layer.type === 'feature') {
+      //     let groupId = layer.title.substr(0, layer.title.indexOf(' - '));
+      //     layer.title = layer.title.replace(groupId + ' - ', '');
+      //     if (mapView.map.findLayerById(groupId)) {
+            
+      //       (mapView.map.findLayerById(groupId) as esri.GroupLayer).add(layer);
+      //       i--;
+
+      //     } else {
+      //       groupLayer = new GroupLayer({title: groupId, id: groupId});
+      //       layer.title = layer.title.replace(groupId + ' - ', '');
+      //       mapView.map.add(groupLayer);
+            
+
+      //       groupLayer.add(layer);
+      //       i--;
+      //     }
+
+    } i++;} while (i < mapView.map.layers.length - 1);
   }
 
   expandPanelExpanded(expanded, widget) {

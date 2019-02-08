@@ -89,9 +89,9 @@
                     </div>                                
                 </mat-card-content>
                 <mat-card-actions *ngIf="_deeds.length > 0">
-                        <button mat-button (click)="openLink('http://services.wakegov.com/realestate/Account.asp?id='+_info.attributes.REID)">Real Estate</button>
-                        <button mat-button (click)="openGoogleStreetview()">Streetview</button>
-                        <button mat-button (click)="openLink('https://coraleigh.github.io/mail-label-generator/pin/'+_info.attributes.PIN_NUM)">Mail Labels</button>
+                        <button mat-raised-button color="primary" (click)="openLink('http://services.wakegov.com/realestate/Account.asp?id='+_info.attributes.REID)">Real Estate</button>
+                        <button mat-raised-button color="primary"  (click)="openGoogleStreetview()">Streetview</button>
+                        <button mat-raised-button color="primary" (click)="openLink('https://coraleigh.github.io/mail-label-generator/pin/'+_info.attributes.PIN_NUM)">Mail Labels</button>
 
                     </mat-card-actions>                
               </mat-card>    

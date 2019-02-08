@@ -263,5 +263,8 @@ $dark-theme:   mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
         @include angular-material-theme($dark-theme);
     }
 
+    .light-theme {
+        @include angular-material-theme($my-app-theme);
+      }
 
 @include angular-material-theme($my-app-theme);

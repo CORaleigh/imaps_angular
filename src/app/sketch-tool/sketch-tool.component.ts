@@ -42,6 +42,11 @@ export class SketchToolComponent implements OnInit {
           this.shared.selectTool.reset();
         }
       });      
+      sketch.watch('updateGraphics', graphics => {
+        graphics.forEach(graphic => {
+          
+        });
+      });
       sketch.on('create', (event) => {
         if (event.state === 'complete' && this.label.length > 0) {
           let textSymbol = {
@@ -60,24 +65,58 @@ export class SketchToolComponent implements OnInit {
           };
           layer.add(new Graphic({geometry:event.graphic.geometry, symbol:textSymbol}));
           this.label = '';
+          console.log(event.graphic);
         }
 
         if (event.state === 'start') {
-          event.graphic.symbol = {
-            type: "simple-fill",  // autocasts as new SimpleFillSymbol()
-            color: new Color(this.fillcolor),
-            style: "solid",
-            outline: {  // autocasts as new SimpleLineSymbol()
-              color: new Color(this.linecolor),
+          if (event.graphic.geometry.type === 'polygon') {
+            event.graphic.symbol = {
+              type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+              color: new Color(this.fillcolor),
+              style: "solid",
+              outline: {  // autocasts as new SimpleLineSymbol()
+                color: new Color(this.linecolor),
+                width: this.width
+              }
+            };
+          } else if (event.graphic.geometry.type === 'polyline') {
+            event.graphic.symbol = {
+              type: "simple-line",  // autocasts as new SimpleFillSymbol()
+              color: new Color(this.fillcolor),
+              style: "solid",
               width: this.width
-            }
-          };
+            };
+          } else if (event.graphic.geometry.type === 'point') {
+            event.graphic.symbol = {
+              type: "simple-marker",  // autocasts as new SimpleFillSymbol()
+              color: new Color(this.fillcolor),
+              style: "solid",
+              outline: {  // autocasts as new SimpleLineSymbol()
+                color: new Color(this.linecolor),
+                width: this.width
+              }
+            };
+          }
         }
       });
     } catch (error) {
       console.log('We have an error: ' + error);
     }
   }
+
+  fillChanged(color) {
+    if(this.shared.sketchTool.updateGraphics.length) {
+      this.shared.sketchTool.updateGraphics.forEach(graphic => {
+        if (graphic.geometry.type === 'polygon' || graphic.geometry.type === 'point') {
+          graphic.symbol.color = color;
+        }
+      });
+    }
+  }
+
+  lineChanged(color) {
+    
+  }  
   ngOnInit() {
     this.shared.sketchEl.next(this.sketchEl);
     this.shared.mapView.subscribe(mapView => {
