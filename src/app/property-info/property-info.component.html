@@ -7,13 +7,11 @@
                 </mat-select>
               </mat-form-field>   -->
         <div #Property>
- 
         <mat-card  class="example-card">
                 <mat-card-header>
                   <mat-card-title>Property</mat-card-title>
                 </mat-card-header>
-
-                <app-photo-gallery  [cardWidth]="propertyInfo.offsetWidth"></app-photo-gallery>
+                <app-photo-gallery *ngIf="cardWidth"  [cardWidth]="cardWidth"></app-photo-gallery>
                 <mat-card-content>
                     <div class="row" *ngIf="_info">
                         <div class="col">

@@ -13,7 +13,7 @@
   }
   .photo-button-back {
     margin-top: 95px;
-    margin-left: 5px;
+    margin-left: -20px;
     float: left;
     z-index: 100;
 }

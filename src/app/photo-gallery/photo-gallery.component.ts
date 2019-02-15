@@ -20,6 +20,7 @@ export class PhotoGalleryComponent implements OnInit {
   ngOnInit() {
     this.shared.photos.subscribe(photos => {
       if (photos) {
+        
         this._photos = [];
         this.photoIndex = 0;
         this.selectedPhoto = photos[this.photoIndex];

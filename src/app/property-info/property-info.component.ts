@@ -18,11 +18,23 @@ export class PropertyInfoComponent implements OnInit {
   @ViewChild('Ownership') private ownerEl: ElementRef;
   @ViewChild('Deeds') private deedEl: ElementRef;
   @ViewChild('propertyInfo') private infoEl: ElementRef;
+  cardWidth:number;
   SWIPE_ACTION = { LEFT: 'swipeleft', RIGHT: 'swiperight' };
 
   ngOnInit() {
-    disableBodyScroll(this.infoEl.nativeElement);
+
+    this.shared.propertyTabIndex.subscribe(index => {
+      if (index === 1) {
+        setTimeout(() => {
+          this.cardWidth = this.infoEl.nativeElement.offsetWidth - 62;
+        });
+      }
+    })
+    disableBodyScroll(this.infoEl.nativeElement);       
+     
+
     this.shared.propertyInfo.subscribe(info => {
+
       if (info) {
         this._info = info;
       }

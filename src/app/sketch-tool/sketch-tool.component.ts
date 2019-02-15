@@ -35,6 +35,7 @@ export class SketchToolComponent implements OnInit {
       this._mapView.map.add(layer);
       let sketch:esri.Sketch = new Sketch({layer:layer, view: this._mapView, container:this.sketchEl.nativeElement});
       this.shared.sketchTool = sketch;
+
       sketch.watch('activeTool', tool => {
         this.activeTool = tool;
         if (['point','polyline','polygon','circle','rectangle'].indexOf(tool) > -1) {
@@ -48,24 +49,43 @@ export class SketchToolComponent implements OnInit {
         });
       });
       sketch.on('create', (event) => {
-        if (event.state === 'complete' && this.label.length > 0) {
-          let textSymbol = {
-            type: "text",  // autocasts as new TextSymbol()
-            color: "white",
-            haloColor: "black",
-            haloSize: "1px",
-            text: this.label,
-            xoffset: 3,
-            yoffset: 3,
-            font: {  // autocast as new Font()
-              size: 12,
-              family: "sans-serif",
-              weight: "bold"
+        if (event.state === 'complete') {
+          if (event.graphic.geometry.type === 'point') {
+            event.graphic.symbol = {
+              type: "simple-marker",  // autocasts as new SimpleFillSymbol()
+              color: new Color(this.fillcolor),
+              style: "circle",
+              size: 10,
+              outline: {  // autocasts as new SimpleLineSymbol()
+                color: new Color(this.linecolor),
+                width: this.width
+              }
+            };
+          }
+          if (this.label.length > 0)   {
+            
+            let textSymbol = {
+              type: "text",  // autocasts as new TextSymbol()
+              color: "white",
+              haloColor: "black",
+              haloSize: "1px",
+              text: this.label,
+              xoffset: 3,
+              yoffset: 3,
+              font: {  // autocast as new Font()
+                size: 12,
+                family: "sans-serif",
+                weight: "bold"
+              }
+            };
+            let geom = event.graphic.geometry;
+            if (geom.type === 'polygon') {
+              geom = event.graphic.geometry.centroid;
             }
-          };
-          layer.add(new Graphic({geometry:event.graphic.geometry, symbol:textSymbol}));
-          this.label = '';
-          console.log(event.graphic);
+            layer.add(new Graphic({geometry:geom, symbol:textSymbol}));
+            this.label = '';
+            console.log(event.graphic);
+          }        
         }
 
         if (event.state === 'start') {
@@ -86,17 +106,7 @@ export class SketchToolComponent implements OnInit {
               style: "solid",
               width: this.width
             };
-          } else if (event.graphic.geometry.type === 'point') {
-            event.graphic.symbol = {
-              type: "simple-marker",  // autocasts as new SimpleFillSymbol()
-              color: new Color(this.fillcolor),
-              style: "solid",
-              outline: {  // autocasts as new SimpleLineSymbol()
-                color: new Color(this.linecolor),
-                width: this.width
-              }
-            };
-          }
+          } 
         }
       });
     } catch (error) {

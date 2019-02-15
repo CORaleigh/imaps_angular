@@ -1,6 +1,6 @@
 <div #sketchDiv></div>
-<input (colorPickerChange)="fillChanged(color)" class="colorPicker" [(colorPicker)]="fillcolor" [style.background]="fillcolor" [cpOutputFormat]="'rgba'" [cpPosition]="'bottom'"/><span>Fill Color</span><br/>
-<input (colorPickerChange)="lineChanged(color)" class="colorPicker" [(colorPicker)]="linecolor" [style.background]="linecolor" [cpOutputFormat]="'rgba'"  [cpPosition]="'bottom'"/><span>Line Color</span>
+<input (colorPickerChange)="fillChanged($event)" class="colorPicker" [(colorPicker)]="fillcolor" [style.background]="fillcolor" [cpOutputFormat]="'rgba'" [cpPosition]="'bottom'"/><span>Fill Color</span><br/>
+<input (colorPickerChange)="lineChanged($event)" class="colorPicker" [(colorPicker)]="linecolor" [style.background]="linecolor" [cpOutputFormat]="'rgba'"  [cpPosition]="'bottom'"/><span>Line Color</span>
 <mat-form-field class="example-full-width">
   <input matInput placeholder="Outline Width (px)" type="number" [(ngModel)]="width" >
 </mat-form-field>

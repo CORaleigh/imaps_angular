@@ -83,3 +83,7 @@ app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
   content: "\e610" !important;
   color: inherit;
 }
+
+.esri-widget a {
+  color: #d1d1d1 !important;
+}

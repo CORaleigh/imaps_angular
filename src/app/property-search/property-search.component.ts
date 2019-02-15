@@ -57,6 +57,7 @@ export class PropertySearchComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.control.disable();
    disableBodyScroll(this.autoEl.nativeElement);
 
     this.shared.mapView.subscribe(mapView => {
@@ -70,7 +71,8 @@ export class PropertySearchComponent implements OnInit {
             this.addressUrl = table.url;
           }
         });
-    
+        this.control.enable();
+
       }
     });
     this.shared.propertyInfo.subscribe(info => {

@@ -24,6 +24,7 @@ import { BookmarksComponent } from './bookmarks/bookmarks.component';
 import { AppsComponent } from './apps/apps.component';
 import { PhotoGalleryComponent } from './photo-gallery/photo-gallery.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ServiceInfoComponent } from './service-info/service-info.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     PrintToolComponent,
     BookmarksComponent,
     AppsComponent,
-    PhotoGalleryComponent
+    PhotoGalleryComponent,
+    ServiceInfoComponent
   ],
   imports: [
     BrowserModule,

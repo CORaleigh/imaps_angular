@@ -5,7 +5,7 @@
       <button mat-button *ngIf="control.value"  matSuffix mat-icon-button aria-label="Clear" (click)="control.setValue('')">
         <mat-icon>close</mat-icon>
       </button>      
-      <mat-autocomplete #autoComplete  #searchGroup="matAutocomplete" (optionSelected)="accountSelected($event)" [displayWith]="displayFn">
+      <mat-autocomplete #autoComplete  #searchGroup="matAutocomplete" (optionSelected)="accountSelected($event)" [displayWith]="displayFn" >
       <mat-optgroup *ngFor="let group of searchGroups" [label]="group.type">
           <mat-option *ngFor="let value of group.values" [value]="value">
           

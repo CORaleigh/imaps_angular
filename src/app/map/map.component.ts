@@ -43,6 +43,7 @@ export class MapComponent implements OnInit {
   private _center: Array<number> = [0.1278, 51.5074];
   private _basemap: string = 'streets';
   private _propertyLayer:esri.FeatureLayer;
+  private _planBoundary:esri.FeatureLayer;
   private isTablet:boolean;
   private isHandset:boolean;
   private _layerList:esri.LayerList;
@@ -81,7 +82,27 @@ export class MapComponent implements OnInit {
   }
   async initializeMap() {
     try {
-      const [WebMap, MapView, config, SimpleFillSymbol, Graphic, GraphicsLayer, GroupLayer, ScaleBar, Fullscreen, Track, Compass, BasemapGallery, LayerList, Legend, Home, Search, Expand, Collection] = await loadModules([
+      const [WebMap, 
+        MapView, 
+        config, 
+        SimpleFillSymbol, 
+        Graphic, 
+        GraphicsLayer, 
+        GroupLayer, 
+        FeatureLayer,
+        ScaleBar, 
+        Fullscreen, 
+        Track, 
+        Compass, 
+        BasemapGallery, 
+        LayerList, 
+        Legend, 
+        Home, 
+        Search, 
+        Expand, 
+        Collection,
+        PortalBasemapsSource
+      ] = await loadModules([
         'esri/WebMap',
         'esri/views/MapView',
         'esri/config',
@@ -89,6 +110,7 @@ export class MapComponent implements OnInit {
         'esri/Graphic',
         'esri/layers/GraphicsLayer',
         'esri/layers/GroupLayer',
+        'esri/layers/FeatureLayer',
 
         "esri/widgets/ScaleBar",
         "esri/widgets/Fullscreen",
@@ -100,7 +122,8 @@ export class MapComponent implements OnInit {
         "esri/widgets/Home",
         "esri/widgets/Search",
         "esri/widgets/Expand",
-        "esri/core/Collection"  
+        "esri/core/Collection",
+        "esri/widgets/BasemapGallery/support/PortalBasemapsSource" 
       ]);
 
       config.portalUrl = this._portalUrl;
@@ -203,9 +226,29 @@ export class MapComponent implements OnInit {
         // Adds the search widget below other elements in
         // the top left corner of the view
         mapView.ui.add(searchWidget, "top-right");
+        this._planBoundary = new FeatureLayer({
+          portalItem: { 
+            id: "a64564abdc1d41bcbb8767ce893c2967"
+          }  
+        });
+
+        mapView.map.watch('basemap', basemap => {
+          let color:string = 'black';
+          if (basemap.title.indexOf('Imagery') > -1) {
+            color = 'white';
+          }
+          let renderer:esri.SimpleRenderer = (this._propertyLayer.renderer as esri.SimpleRenderer).clone();
+          
+          //@ts-ignore
+          renderer.symbol.outline.color = color;
+          this._propertyLayer.renderer = renderer;          
+        });
 
         this._basemapGallery = new BasemapGallery(
           {view:mapView,
+            source: new PortalBasemapsSource({
+              query: "id:f2360ebbfe5242a299551e9e7323ef3e"
+            }),
             container: document.createElement("div"),
           });
           let expand:esri.Expand = new Expand({
@@ -220,11 +263,31 @@ export class MapComponent implements OnInit {
             //@ts-ignore
              this.expandPanelExpanded(expanded, this._basemapGallery);
            });
+           let basemapExpand = expand;
 
           
           
         mapView.ui.add(expand, "top-right");   
+        mapView.watch('updating', updating => {
+          if (!updating) {
+            
+            this._planBoundary.queryFeatureCount({geometry: mapView.center}).then(count => {
+              let groupid = 'id:f2360ebbfe5242a299551e9e7323ef3e';
+              if (count === 0) {
+                groupid = 'id:2f1f161b96c5406984546432c3d501e1';
+              }
 
+              this._basemapGallery = new BasemapGallery(
+                {view:mapView,
+                  source: new PortalBasemapsSource({
+                    query: groupid
+                  }),
+                  container: document.createElement("div"),
+                });       
+              basemapExpand.content = this._basemapGallery;
+            });
+          }
+        });
 
         this._layerList = new LayerList(
           {view:mapView,
@@ -454,19 +517,19 @@ export class MapComponent implements OnInit {
     let subLayer:esri.GroupLayer;
     do  {
       let layer = mapView.map.layers.getItemAt(i);
-      let levels = layer.title.split(' - ').length
+      let levels = layer.title.split('|').length
       if (levels > 0 && layer.type === 'feature') {
-        let groupId = layer.title.substr(0, layer.title.indexOf(' - '));
-        layer.title = layer.title.replace(groupId + ' - ', '');
+        let groupId = layer.title.substr(0, layer.title.indexOf('|'));
+        layer.title = layer.title.replace(groupId + '|', '');
         if (mapView.map.findLayerById(groupId)) {
 
         } else {
           groupLayer = new GroupLayer({title: groupId, id: groupId});
           mapView.map.add(groupLayer);
         }
-        if (layer.title.indexOf(' - ') > -1) {
-          let subId = layer.title.substr(0, layer.title.indexOf(' - '));
-          layer.title = layer.title.replace(subId + ' - ', '');
+        if (layer.title.indexOf('|') > -1) {
+          let subId = layer.title.substr(0, layer.title.indexOf('|'));
+          layer.title = layer.title.replace(subId + '|', '');
           if (mapView.map.findLayerById(subId)) {
             mapView.map.findLayerById(subId).add(layer);
             i--;
@@ -486,9 +549,9 @@ export class MapComponent implements OnInit {
       // }
 
 
-      //   if (layer.title.indexOf(' - ') > -1 && layer.type === 'feature') {
-      //     let groupId = layer.title.substr(0, layer.title.indexOf(' - '));
-      //     layer.title = layer.title.replace(groupId + ' - ', '');
+      //   if (layer.title.indexOf('|') > -1 && layer.type === 'feature') {
+      //     let groupId = layer.title.substr(0, layer.title.indexOf('|'));
+      //     layer.title = layer.title.replace(groupId + '|', '');
       //     if (mapView.map.findLayerById(groupId)) {
             
       //       (mapView.map.findLayerById(groupId) as esri.GroupLayer).add(layer);
@@ -496,7 +559,7 @@ export class MapComponent implements OnInit {
 
       //     } else {
       //       groupLayer = new GroupLayer({title: groupId, id: groupId});
-      //       layer.title = layer.title.replace(groupId + ' - ', '');
+      //       layer.title = layer.title.replace(groupId + '|', '');
       //       mapView.map.add(groupLayer);
             
 

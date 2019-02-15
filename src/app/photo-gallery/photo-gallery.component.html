@@ -1,7 +1,7 @@
 <button mat-mini-fab color="primary" class="photo-button photo-button-back" (click)='previousPhoto()' *ngIf="photoIndex > 0">
     <mat-icon aria-label="Example icon-button with a heart icon">arrow_back</mat-icon>
   </button>   
-  <button mat-mini-fab color="primary" class="photo-button photo-button-next" (click)='nextPhoto()' *ngIf="photoIndex < _photos.length - 1" [style.margin-left]="cardWidth - 50 +'px'">
+  <button mat-mini-fab color="primary" class="photo-button photo-button-next" (click)='nextPhoto()' *ngIf="photoIndex < _photos.length - 1" [style.margin-left]="cardWidth - 75 +'px'">
         <mat-icon aria-label="Example icon-button with a heart icon">arrow_forward</mat-icon>
       </button>     
       <div class="cdk-virtual-scroll-data-source-example">

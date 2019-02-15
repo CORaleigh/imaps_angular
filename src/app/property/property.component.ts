@@ -9,7 +9,6 @@ import { SharedService } from '../shared.service';
 export class PropertyComponent implements OnInit {
 
   constructor(public shared:SharedService) { }
-  selectedIndex:number = 0;
   ngOnInit() {
     // this.shared.propertyResults.subscribe(results => {
     //   
@@ -20,16 +19,16 @@ export class PropertyComponent implements OnInit {
     //   }
     // });
     this.shared.propertyInfo.subscribe(info => {
-      this.shared.propertyTabIndex = 0;
+      this.shared.propertyTabIndex.next(0);
       if (info) {
-        this.shared.propertyTabIndex  = 1;
+        this.shared.propertyTabIndex.next(1);
       } else {
-        this.shared.propertyTabIndex  = 0;
+        this.shared.propertyTabIndex.next(0);
       }
     });    
     this.shared.propertyResults.subscribe(results => {
       if (results.length > 1) {
-        this.shared.propertyTabIndex  = 0;
+        this.shared.propertyTabIndex.next(0);
       }
     });        
   }
