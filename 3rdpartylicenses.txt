@@ -641,9 +641,9 @@ SOFTWARE.
 
 @angular/material/paginator
 
-@angular/material/card
-
 @angular/cdk/scrolling
+
+@angular/material/card
 
 zone.js
 MIT
