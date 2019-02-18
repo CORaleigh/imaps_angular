@@ -1,3 +1,5 @@
+<div #serviceInfo class="container">
+
 <mat-form-field>
   <mat-select placeholder="Select a category" [(value)]="selected" (selectionChange)="selectionChanged($event)">
     <mat-option *ngFor="let category of categories" [value]="category">
@@ -12,3 +14,4 @@
     <div [id]="layer.id"></div>
   </div>
 <!-- </div> -->
+</div>

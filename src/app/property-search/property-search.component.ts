@@ -159,6 +159,8 @@ export class PropertySearchComponent implements OnInit {
                   photos = photos.sort(this.sortPhotos);
                   this.shared.photos.next(photos);
                 }
+              } else {
+                this.shared.photos.next([]);
               }
             });
           } else if (relationship.name === 'CONDO_BOOKS') {
@@ -169,6 +171,22 @@ export class PropertySearchComponent implements OnInit {
                 }
               }
             });            
+          } else if (relationship.name === 'CONDO_RALEIGH_ADDRESSES') {
+            this.property.getRaleighAddresses(this.condoUrl, info.attributes.OBJECTID, relationship.id).subscribe(data => {
+              if (data.relatedRecordGroups.length > 0) {
+                if (data.relatedRecordGroups[0].relatedRecords.length > 0) {
+                  this.shared.addresses.next(data.relatedRecordGroups[0].relatedRecords);
+                }
+              } else {
+                this.property.getWakeAddresses(this.condoUrl, info.attributes.OBJECTID, result.relationships.filter(relationship => relationship.name === 'CONDO_ADDRESSES')[0].id).subscribe(data => {
+                  if (data.relatedRecordGroups.length > 0) {
+                    if (data.relatedRecordGroups[0].relatedRecords.length > 0) {
+                      this.shared.addresses.next(data.relatedRecordGroups[0].relatedRecords);
+                    }
+                  }    
+                });              
+              }
+            });     
           }
         });
       }

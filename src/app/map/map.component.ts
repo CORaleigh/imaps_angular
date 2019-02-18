@@ -16,7 +16,7 @@ import { loadModules } from 'esri-loader';
 import esri = __esri;
 import { SharedService } from '../shared.service';
 import { PropertyService } from '../property.service';
-import { Expression, isNgTemplate } from '@angular/compiler';
+import {Location} from '@angular/common';
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { ActivatedRoute, Router } from '@angular/router';
 import '../modernizr.js';
@@ -48,7 +48,8 @@ export class MapComponent implements OnInit {
   private isHandset:boolean;
   private _layerList:esri.LayerList;
   private _basemapGallery:esri.BasemapGallery;
-
+  private _raleighGroupId:string = 'f2360ebbfe5242a299551e9e7323ef3e';
+  private _countyGroupId:string = '2f1f161b96c5406984546432c3d501e1';
   @Input()
   set zoom(zoom: number) {
     this._zoom = zoom;
@@ -76,7 +77,7 @@ export class MapComponent implements OnInit {
     return this._basemap;
   }
 
-  constructor(public shared:SharedService, private property:PropertyService, private router:Router, private route: ActivatedRoute) { }
+  constructor(public shared:SharedService, private property:PropertyService, private router:Router, private route: ActivatedRoute, private location:Location) { }
   createWidget() {
     
   }
@@ -204,6 +205,8 @@ export class MapComponent implements OnInit {
               (layer as esri.GraphicsLayer).removeAll();
             }
           });
+          this.location.replaceState('/');
+
           this.shared.propertyInfo.next(null);
           this.shared.propertyResults.next([]);
           return null;
@@ -247,13 +250,14 @@ export class MapComponent implements OnInit {
         this._basemapGallery = new BasemapGallery(
           {view:mapView,
             source: new PortalBasemapsSource({
-              query: "id:f2360ebbfe5242a299551e9e7323ef3e"
+              query: "id:" + this._raleighGroupId
             }),
             container: document.createElement("div"),
           });
           let expand:esri.Expand = new Expand({
             view: mapView, 
             expandIconClass: "esri-icon-basemap",
+            group: 'top-right',
             //@ts-ignore
             content: this._basemapGallery.domNode}
           );          
@@ -272,19 +276,23 @@ export class MapComponent implements OnInit {
           if (!updating) {
             
             this._planBoundary.queryFeatureCount({geometry: mapView.center}).then(count => {
+              
               let groupid = 'id:f2360ebbfe5242a299551e9e7323ef3e';
               if (count === 0) {
                 groupid = 'id:2f1f161b96c5406984546432c3d501e1';
               }
-
-              this._basemapGallery = new BasemapGallery(
-                {view:mapView,
-                  source: new PortalBasemapsSource({
-                    query: groupid
-                  }),
-                  container: document.createElement("div"),
-                });       
-              basemapExpand.content = this._basemapGallery;
+              //@ts-ignore
+              if (this._basemapGallery.source.query != groupid) {                
+                this._basemapGallery = new BasemapGallery(
+                  {view:mapView,
+                    source: new PortalBasemapsSource({
+                      query: groupid
+                    }),
+                    container: document.createElement("div"),
+                  });       
+               
+                basemapExpand.content = this._basemapGallery;
+              }
             });
           }
         });
@@ -298,6 +306,8 @@ export class MapComponent implements OnInit {
         expand = new Expand({
             view: mapView, 
             expandIconClass: "esri-icon-layers",
+            group: 'top-right',
+
             //@ts-ignore
             content:  this._layerList.domNode}
           );
@@ -362,6 +372,8 @@ export class MapComponent implements OnInit {
                    //@ts-ignore
           content: legend.domNode,
           view: mapView,
+          group: 'top-right',
+
           expandIconClass: "esri-icon-layer-list",
 
           expanded: false
@@ -376,10 +388,41 @@ export class MapComponent implements OnInit {
         let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
         let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics', listMode: 'hide'});
         mapView.map.addMany([multiGraphics, singleGraphics]);
+        // mapView.on('pointer-move', event => {
+        //   mapView.hitTest(event).then(e => {
+        //     let features = e.results.filter(result => result.graphic.layer.title === 'multiGraphics');
+        //     if (features.length) {
+        //       let feature = features[0].graphic;
+        //       console.log(feature.attributes.OWNER);
+        //       let g = new Graphic({geometry: features[0].mapPoint, attributes:feature.attributes, symbol: {
+        //         type: "text",  // autocasts as new TextSymbol()
+        //         color: "white",
+        //         haloColor: "black",
+        //         haloSize: "1px",
+        //         text: feature.attributes.SITE_ADDRESS+'\n'+feature.attributes.OWNER,
+        //         xoffset: 3,
+        //         yoffset: 3,
+        //         font: {  // autocast as new Font()
+        //           size: 8,
+        //           family: "sans-serif",
+        //           weight: "bold"
+        //         }
+        //       }});
+        //       mapView.graphics.removeAll();
+        //       mapView.graphics.add(g);
+        //     } else {
+        //       mapView.graphics.removeAll();
+        //     }
+        //   });
+        // });
         mapView.on('layerview-create', event => {
-          if (event.layer.title) {
+          console.log(event.layer.title);
+          console.log(event.layer.type);
 
+          if (event.layer.title) {
+            
           } else {
+            debugger
             event.layer.listMode = 'hide';
           }
         });
@@ -389,7 +432,7 @@ export class MapComponent implements OnInit {
             mapView.whenLayerView(layer).then((layerView: esri.FeatureLayerView) => {
               this._propertyLayer = layerView.layer;
               if (this.route.routeConfig) {
-                if (this.route.routeConfig.path === 'pin/:pin') { 
+                if (this.route.routeConfig.path === 'pin/:pin' || this.route.routeConfig.path === 'reid/:reid') { 
                   this.route.paramMap.subscribe(params => {
                     let url:string = '';
                   //@ts-ignore
@@ -397,8 +440,13 @@ export class MapComponent implements OnInit {
                     if (table.title.indexOf('Condos') > -1) {
                       url = table.url;
                     }
-                  });        
-                  this.property.queryCondos(url, "PIN_NUM IN ('" + params.get('pin') + "')",'PIN_NUM');
+                  });
+                  if (params.get('pin')) {
+                    this.property.queryCondos(url, "PIN_NUM IN ('" + params.get('pin') + "')",'PIN_NUM');
+                  } else if (params.get('reid')) {
+                    this.property.queryCondos(url, "REID IN ('" + params.get('reid') + "')",'REID');
+
+                  }
 
                   });  
                 }
@@ -454,6 +502,7 @@ export class MapComponent implements OnInit {
                     results.features.forEach(feature => {
                       let g:esri.Graphic = new Graphic();
                       g.geometry = feature.geometry;
+                      g.attributes = feature.attributes;
                       let symbol:esri.SimpleFillSymbol = new SimpleFillSymbol(
                       {
                          color: [ 51,51, 204, 0 ],
@@ -464,14 +513,17 @@ export class MapComponent implements OnInit {
                          }
                        });
                        g.symbol = symbol;
-
                       multiGraphics.add(g);                         
-                    })
+                    });
+                    mapView.map.reorder(mapView.map.findLayerById('singleGraphics'), 0);
+                    mapView.map.reorder(mapView.map.findLayerById('multiGraphics'), 1);                    
                   })
                 }
               });
               this.shared.propertyInfo.subscribe(info => {
                 if (info) {
+                  this.location.replaceState('/reid/' + info.attributes.REID);
+                  //this.router.navigate(['/pin/' + info.attributes.PIN_NUM]);
                   this.property.getProperties('https://maps.raleighnc.gov/arcgis/rest/services/Property/Property/FeatureServer/1', info.attributes.OBJECTID, 0).subscribe(result => {
                     if (result.relatedRecordGroups[0].relatedRecords.length > 0) {
                       layerView.layer.queryFeatures({objectIds: result.relatedRecordGroups[0].relatedRecords[0].attributes.OBJECTID, returnGeometry: true, outFields:['*'], outSpatialReference:mapView.spatialReference}).then(results => {

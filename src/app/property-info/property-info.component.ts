@@ -10,6 +10,8 @@ import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'bo
 export class PropertyInfoComponent implements OnInit {
    _info:any;
    _deeds:any[];
+   _addresses:any[];
+
   sections:string[] = ['Property', 'Ownership', 'Deeds'];
 
   
@@ -44,7 +46,13 @@ export class PropertyInfoComponent implements OnInit {
       if (deeds) {
         this._deeds = deeds;
       }
-    });        
+    });     
+    this.shared.addresses.subscribe(addresses => {
+      if (addresses) {
+        this._addresses = addresses;
+        console.log(this._addresses)
+      }
+    });           
   }
 
   openLink(url) {

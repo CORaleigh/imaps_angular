@@ -74,6 +74,27 @@ export class PropertyService {
 
     return this.http.get<any>(url + '/queryRelatedRecords', {params: params}); 
   }  
+
+  getRaleighAddresses(url: string, oid: number, relationshipId: number) {
+    let params:HttpParams = new HttpParams()
+      .set('objectIds', oid.toString())
+      .set('relationshipId', relationshipId.toString())
+      .set('outFields', '*')
+      .set('returnGeometry', 'false')
+      .set('f', 'json')
+
+    return this.http.get<any>(url + '/queryRelatedRecords', {params: params}); 
+  }
+  getWakeAddresses(url: string, oid: number, relationshipId: number) {
+    let params:HttpParams = new HttpParams()
+      .set('objectIds', oid.toString())
+      .set('relationshipId', relationshipId.toString())
+      .set('outFields', '*')
+      .set('returnGeometry', 'false')
+      .set('f', 'json')
+
+    return this.http.get<any>(url + '/queryRelatedRecords', {params: params}); 
+  }  
   getProperties(url: string, oid: number[], relationshipId: number) {
     let params:HttpParams = new HttpParams()
       .set('objectIds', oid.toString())

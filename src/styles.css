@@ -87,3 +87,22 @@ app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
 .esri-widget a {
   color: #d1d1d1 !important;
 }
+
+
+.container .esri-popup__main-container {
+  width: auto;
+}
+
+.container .esri-popup__header-buttons{
+  display: none !important;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  z-index: 10000;
+  -webkit-overflow-scrolling: touch !important;
+  overflow-y:auto !important;
+}
+

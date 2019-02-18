@@ -1,12 +1,12 @@
 <button mat-mini-fab color="primary" class="photo-button photo-button-back" (click)='previousPhoto()' *ngIf="photoIndex > 0">
     <mat-icon aria-label="Example icon-button with a heart icon">arrow_back</mat-icon>
   </button>   
-  <button mat-mini-fab color="primary" class="photo-button photo-button-next" (click)='nextPhoto()' *ngIf="photoIndex < _photos.length - 1" [style.margin-left]="cardWidth - 75 +'px'">
+  <button mat-mini-fab color="primary" class="photo-button photo-button-next" (click)='nextPhoto()' *ngIf="photoIndex < _photos.length - 1" [style.margin-left]="cardWidth - 50 +'px'">
         <mat-icon aria-label="Example icon-button with a heart icon">arrow_forward</mat-icon>
       </button>     
       <div class="cdk-virtual-scroll-data-source-example">
 
-          <cdk-virtual-scroll-viewport id="photoViewport"  orientation="horizontal" [style.height]="cardWidth * 0.75 + 'px'" [style.width]="cardWidth + 'px'" [itemSize]="cardWidth" [maxBufferPx]="cardWidth * 3" [minBufferPx]="cardWidth * 2" (swipeleft)="swipe($event.type)" (swiperight)="swipe($event.type)"   class="example-viewport"  >
+          <cdk-virtual-scroll-viewport *ngIf="_photos.length"  id="photoViewport"  orientation="horizontal" [style.height]="cardWidth * 0.75 + 'px'" [style.width]="cardWidth + 'px'" [itemSize]="cardWidth" [maxBufferPx]="cardWidth * 3" [minBufferPx]="cardWidth * 2" (swipeleft)="swipe($event.type)" (swiperight)="swipe($event.type)"   class="example-viewport"  >
               <div *cdkVirtualFor="let photo of _photos" class="example-item" [style.width]="cardWidth +'px'">
                   <img [style.z-index]="_photos.length - i" [style.width]="cardWidth +'px'" [ngClass]="{'current': i === photoIndex,'previous': i === photoIndex - 1,'next': i=== photoIndex + 1}" mat-card-image src="http://services.wakegov.com/realestate/photos/mvideo/{{photo.attributes.IMAGEDIR}}/{{photo.attributes.IMAGENAME}}">
               </div>

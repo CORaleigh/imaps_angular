@@ -25,6 +25,7 @@ import { AppsComponent } from './apps/apps.component';
 import { PhotoGalleryComponent } from './photo-gallery/photo-gallery.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ServiceInfoComponent } from './service-info/service-info.component';
+import { AddressTableComponent } from './address-table/address-table.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { ServiceInfoComponent } from './service-info/service-info.component';
     BookmarksComponent,
     AppsComponent,
     PhotoGalleryComponent,
-    ServiceInfoComponent
+    ServiceInfoComponent,
+    AddressTableComponent
   ],
   imports: [
     BrowserModule,

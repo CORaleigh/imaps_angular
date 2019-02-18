@@ -10,6 +10,7 @@ import { MatDrawer } from '@angular/material';
 export class NavComponent implements OnInit {
   private isHandset:boolean;
   private isTablet:boolean;
+  private bothPanels:boolean;
   @ViewChild('searchdrawer') private searchDrawer: MatDrawer;
   constructor(public shared:SharedService){}
   mapCenter = [-122.4194, 37.7749];
@@ -19,11 +20,14 @@ export class NavComponent implements OnInit {
   // See app.component.html
   mapLoadedEvent(status: boolean) {
     console.log('The map loaded: ' + status);
+
+
   }
 
   ngOnInit() {
-    this.shared.isHandset$.subscribe(val => {this.isHandset = val});
-    this.shared.isTablet$.subscribe(val => {this.isTablet = val});
+    this.shared.isHandset$.subscribe(val => {this.isHandset = val;});
+    this.shared.isTablet$.subscribe(val => {this.isTablet = val;});
+    this.shared.bothPanels$.subscribe(val => {this.bothPanels = val;});
 
     this.shared.propertyInfo.subscribe(info => {
       if (info) {
@@ -46,14 +50,15 @@ export class NavComponent implements OnInit {
   }
 
   hideToolbar(opened) {
-    if (this.isHandset) {
+    if (this.isHandset || this.isTablet) {
+      debugger
       this.shared.showToolbar = !opened;
     }
   }
   toggle(thisDrawer, thatDrawer) {
     
     thisDrawer.toggle();
-    if (this.isTablet || this.isHandset) {
+    if (this.bothPanels) {
       if (thatDrawer.opened) {
         thatDrawer.toggle();
   

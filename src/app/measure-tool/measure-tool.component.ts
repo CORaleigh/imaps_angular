@@ -39,6 +39,9 @@ group:any = {};
   }      
 
   toolChanged(event) {
+    this.shared.sketchTool.reset();
+    this.shared.selectTool.reset();
+
     this.selected = event.value;
     let selectedClass = ''
     let hiddenClasses = [];

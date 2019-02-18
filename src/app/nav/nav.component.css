@@ -22,7 +22,7 @@
 }
 
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 769px) {
 
   .mat-sidenav-container{
     height: calc(100% - 64px);
@@ -42,7 +42,7 @@
 }
 
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 769px) {
   .sidenav {
     max-width: 90%;
     top:64px !important;

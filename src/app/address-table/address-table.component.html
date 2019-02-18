@@ -1,0 +1,35 @@
+<div>
+  <table mat-table class="full-width-table" [dataSource]="dataSource" matSort aria-label="Elements">
+    <!-- Address Column -->
+    <ng-container matColumnDef="ADDRESS">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Address</th>
+      <td mat-cell *matCellDef="let row">{{row.ADDRESS}}</td>
+    </ng-container>
+    <!-- Type Column -->
+    <ng-container matColumnDef="SUITE">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Suite</th>
+        <td mat-cell *matCellDef="let row">{{row.SUITE}}</td>
+      </ng-container>    
+    <!-- Type Column -->
+    <ng-container matColumnDef="TYPE">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+        <td mat-cell *matCellDef="let row">{{row.TYPE}}</td>
+      </ng-container>
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="STATUS">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let row">{{row.STATUS}}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator #paginator
+      [length]="dataSource.data.length"
+      [pageIndex]="0"
+      [pageSize]="10"
+      [pageSizeOptions]="[10, 25, 50, 100, 250]">
+  </mat-paginator>
+</div>

@@ -42,7 +42,7 @@
   
 
 
-.mat-card-header {
+/* .mat-card-header {
     padding-top: 16px;
 }
 .mat-card-actions {
@@ -51,4 +51,10 @@
 
 .mat-card-content {
     padding: 16px;
+} */
+
+.address-card .mat-card-content {
+    padding: 0;
+    margin-left: -16px;
+    margin-right: -16px;
 }

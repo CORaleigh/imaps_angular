@@ -16,6 +16,8 @@ export class SharedService {
   propertyInfo:BehaviorSubject<any> = new BehaviorSubject<any>(null);
   propertyIds:BehaviorSubject<number[]> = new BehaviorSubject<number[]>([])
   photos:BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  addresses:BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+
   deeds:BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
   sketchEl:BehaviorSubject<ElementRef> = new BehaviorSubject<ElementRef>(null);
   selectEl:BehaviorSubject<ElementRef> = new BehaviorSubject<ElementRef>(null);
@@ -32,8 +34,12 @@ export class SharedService {
   .pipe(
     map(result => result.matches)
   );
-  isTablet$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Tablet)
+  isTablet$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.TabletPortrait)
     .pipe(
       map(result => result.matches)
     );
+  bothPanels$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.TabletLandscape)
+    .pipe(
+      map(result => result.matches)
+    );    
 }

@@ -1,5 +1,8 @@
 <mat-toolbar color="primary" *ngIf="shared.showToolbar">
 
+
+  <span>iMAPS</span>
+  <span class="example-fill-remaining-space"></span>
   <button
     type="button"
     aria-label="Toggle sidenav"
@@ -8,9 +11,6 @@
    >
     <mat-icon aria-label="Side nav toggle icon">build</mat-icon>
   </button>    
-  <span>iMAPS</span>
-  <span class="example-fill-remaining-space"></span>
-
   <button
     type="button"
     aria-label="Toggle sidenav"
@@ -26,11 +26,11 @@
 </mat-toolbar>
 <mat-sidenav-container class="sidenav-container dark-theme" [ngClass]="{'fullHeight': !shared.showToolbar}">
     <mat-sidenav #tooldrawer class="toolnav sidenav" fixedInViewport="true"
-        [attr.role]="(shared.isHandset$ || shared.isTablet$ | async) ? 'dialog' : 'navigation'"
-        [mode]="(shared.isHandset$ || shared.isTablet$ | async) ? 'over' : 'side'"
-        [opened]="false"
+      [attr.role]="(shared.isHandset$ | async) || (shared.isTablet$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(shared.isHandset$ | async) || (shared.isTablet$ | async) ? 'over' : 'side'"
+      [opened]="false"
         position="start">
-        <mat-toolbar *ngIf="(shared.isHandset$ || shared.isTablet$ | async)">
+        <mat-toolbar *ngIf="(shared.isHandset$ | async) || (shared.isTablet$ | async)">
             <span>Tools</span>
             <span class="example-fill-remaining-space"></span>
   
@@ -55,11 +55,11 @@
       </app-map>
     </mat-sidenav-content>
     <mat-sidenav #searchdrawer class="searchnav sidenav" fixedInViewport="true"
-        [attr.role]="(shared.isHandset$ || shared.isTablet$ | async) ? 'dialog' : 'navigation'"
-        [mode]="(shared.isHandset$ || shared.isTablet$ | async) ? 'over' : 'side'"
-        [opened]="!(shared.isHandset$ | async)"
+        [attr.role]="(shared.isHandset$ | async) || (shared.isTablet$ | async) ? 'dialog' : 'navigation'"
+        [mode]="(shared.isHandset$ | async) || (shared.isTablet$ | async) ? 'over' : 'side'"
+        [opened]="!(shared.isHandset$ | async) && !(shared.isTablet$ | async)"
         position="end">
-        <mat-toolbar *ngIf="(shared.isHandset$ || shared.isTablet$ | async)">
+        <mat-toolbar *ngIf="(shared.isHandset$ | async) || (shared.isTablet$ | async)">
           <span>Search</span>
           <span class="example-fill-remaining-space"></span>
 

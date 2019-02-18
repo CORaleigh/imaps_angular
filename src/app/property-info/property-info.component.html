@@ -19,8 +19,11 @@
                                 PIN
                             </div>
                             <div class="row">
-                                {{_info.attributes.PIN_NUM}} <span *ngIf="_info.attributes.PIN_EXT != '000'"> _info.attributes.PIN_EXT</span>
-                            </div>                                                                                                                         
+                                {{_info.attributes.PIN_NUM}}<p *ngIf="_info.attributes.PIN_EXT != '000'"> {{_info.attributes.PIN_EXT}}</p>
+                            </div>                
+                            <div class="row" *ngIf="_info.attributes.PIN_EXT != '000'">
+                                    {{_info.attributes.PIN_NUM}}<p > {{_info.attributes.PIN_EXT}}
+                                </div>                                                                                                                                       
                         </div>
                         <div class="col">
                             <div class="row bold">
@@ -78,18 +81,28 @@
                                 </div>
                             <div class="col">
                                     <div class="row bold">
-                                        Description
+                                        Land Class
                                     </div>
                                     <div class="row">
-                                        {{_info.attributes.PROPDESC}}
+                                        {{_info.attributes.LAND_CLASS_DECODE}}
                                     </div>        
                                 </div>               
-                    </div>                                
+                    </div>  
+                    <div class="row" *ngIf="_info">
+                            <div class="col">
+                                <div class="row bold">
+                                    Description
+                                </div>
+                                <div class="row">
+                                    {{_info.attributes.PROPDESC}}
+                                </div>                                                                                                                         
+                            </div>              
+                        </div>                                                  
                 </mat-card-content>
                 <mat-card-actions *ngIf="_deeds.length > 0">
-                        <button mat-raised-button color="primary" (click)="openLink('http://services.wakegov.com/realestate/Account.asp?id='+_info.attributes.REID)">Real Estate</button>
-                        <button mat-raised-button color="primary"  (click)="openGoogleStreetview()">Streetview</button>
-                        <button mat-raised-button color="primary" (click)="openLink('https://coraleigh.github.io/mail-label-generator/pin/'+_info.attributes.PIN_NUM)">Mail Labels</button>
+                        <button mat-button color="warn" (click)="openLink('http://services.wakegov.com/realestate/Account.asp?id='+_info.attributes.REID)">Real Estate</button>
+                        <button mat-button color="warn"  (click)="openGoogleStreetview()">Streetview</button>
+                        <button mat-button color="warn" (click)="openLink('https://coraleigh.github.io/mail-label-generator/pin/'+_info.attributes.PIN_NUM)">Mail Labels</button>
 
                     </mat-card-actions>                
               </mat-card>    
@@ -124,7 +137,7 @@
                     </div>       
                 </div>                    
             </div>
-            <div class="row" *ngIf="_info">
+            <div class="row" *ngIf="_info && _info.attributes.SALE_DATE">
                 <div class="col">
                     <div class="row bold">
                         Sale Price
@@ -188,6 +201,51 @@
                     </div>
             </mat-card-content>
           </mat-card>      
+          <mat-card #Building class="example-card">
+                <mat-card-header>
+                  <mat-card-title>Building</mat-card-title>
+                </mat-card-header>
+        
+                <mat-card-content>
+                    <div class="row" *ngIf="_info">
+                        <div class="col">
+                            <div class="row bold">
+                                Use Type
+                            </div>
+                            <div class="row">
+                                {{_info.attributes.TYPE_USE_DECODE}}
+                            </div>                                                                                                                         
+                        </div>
+                        <div class="col">
+                                <div class="row bold">
+                                    Heated Area
+                                </div>
+                                <div class="row">
+                                    {{_info.attributes.HEATEDAREA | number}} ft<sup>2</sup>
+                                </div>                                                                                                                         
+                            </div>                  
+                    </div>
+                    <div class="row" *ngIf="_info">
+                            <div class="col">
+                                <div class="row bold">
+                                    Design Style
+                                </div>
+                                <div class="row">
+                                    {{_info.attributes.DESIGN_STYLE_DECODE}}
+                                </div>                                                                                                                         
+                            </div>
+                            <div class="col">
+                                    <div class="row bold">
+                                        Year Built
+                                    </div>
+                                    <div class="row">
+                                        {{_info.attributes.YEAR_BUILT}}
+                                    </div>                                                                                                                         
+                                </div>                  
+                        </div>
+                        
+                </mat-card-content>
+              </mat-card>                
       <div #Deeds>
       <mat-card #Deeds class="example-card" *ngIf="_deeds.length > 0">
             <mat-card-header>
@@ -219,15 +277,34 @@
                         <div class="row">
                         {{deed.attributes.DEED_DATE | date}} 
                         </div>          
-                    </div>                                                        
+                    </div>   
+                    <div class="col">
+                            <div class="row bold">
+                            Acres
+                            </div>
+                            <div class="row">
+                            {{_info.attributes.DEED_ACRES | number : '1.2-2'}} 
+                            </div>          
+                        </div>                                                                            
             </div>
        
         </div>            
         </mat-card-content>      
         <mat-card-actions *ngIf="_deeds.length > 0">
-                <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM)">View Deed</button>
-                <button mat-button (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.BOM_DOC_NUM+'&RecordDate=')">View Plat</button>
+                <button mat-button color="warn" (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM+'&RecordDate=')">View Deed</button>
+                <button mat-button color="warn"  (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.BOM_DOC_NUM+'&RecordDate=')">View Plat</button>
               </mat-card-actions>
         </mat-card>     
     </div>
+    <div #Addresses>
+        <mat-card #Addresses class="example-card address-card" *ngIf="_deeds.length > 0">
+              <mat-card-header>
+                <mat-card-title>Addresses</mat-card-title>
+              </mat-card-header>      
+                <mat-card-content>
+                    <app-address-table></app-address-table>
+                </mat-card-content>      
+
+          </mat-card>     
+      </div>    
 </div>

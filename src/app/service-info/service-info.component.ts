@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { SharedService } from '../shared.service';
 import { loadModules } from 'esri-loader';
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 import esri = __esri;
 
@@ -12,8 +13,11 @@ import esri = __esri;
 export class ServiceInfoComponent implements OnInit {
 
   constructor(private shared:SharedService) { }
+  @ViewChild('serviceInfo') private infoEl: ElementRef;
 
   ngOnInit() {
+    disableBodyScroll(this.infoEl.nativeElement);       
+
     this.initialize();
     this.shared.propertyTabIndex.subscribe(index => {
       if (index === 2) {
@@ -24,11 +28,15 @@ export class ServiceInfoComponent implements OnInit {
 
 categories:category[] = [
   {name: 'Voting', layers: [
+    {id: 'Voting_Precincts_With_Polling_Places_5296'},    
+    {id: 'Boundaries_9642'},
+    {id: 'Elections_2423'},
+    {id: 'CommissionerDistricts_2825'},
+    {id: 'CongressionalDistricts_8719'},    
     {id: 'NCSenateDistricts_4915'},
     {id: 'NCHouseDistricts_1457'},
-    {id: 'CongressionalDistricts_8719'},
     {id: 'DistrictCourtJudicialDistricts_2355'},
-    {id: 'Voting_Precincts_With_Polling_Places_5296'}
+    {id: 'SchoolBoardDistricts_4941'}
   ]},
   {name: 'Environmental', layers: [
     {id: 'WellSeptic_3409'},
@@ -36,10 +44,23 @@ categories:category[] = [
     {id: 'Soils_1541'}
   ]},
   {name: 'Planning', layers:[
-    {id: 'CaryTaxZoning_7421'}
+    {id: 'CaryTaxZoning_7421'},
+    {id: 'Subdivisions_8007'},
+    {id: 'Jurisdictions_8484'},
+    {id: 'Jurisdictions_5318'}
   ]},
   {name: 'Public Safety', layers: [
-    {id: 'Raleigh_Police_Districts_9509'}
+    {id: 'Raleigh_Police_Districts_9509'},
+    {id: 'PublicSafetyDistricts_5194'},
+    {id: 'PublicSafety_4174'},
+    {id: 'PublicSafetyDistricts_1887'},
+    {id: 'PublicSafetyDistricts_185'},
+    {id: 'PublicSafetyDistricts_5406'},
+    {id: 'PublicSafetyDistricts_7409'}
+  ]},
+  {name: 'Solid Waste', layers: [
+    {id: 'PortalServices_9365'},
+    {id: 'ServicesIMaps_1004'}
   ]}
 ];
 selected:category = this.categories[0];
