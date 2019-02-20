@@ -589,14 +589,18 @@ MIT
 
 @angular/material/icon
 
+@angular/material/menu
+
+@angular/forms
+MIT
+
+@angular/material/slide-toggle
+
 @angular/material/sidenav
 
 @angular/material/tabs
 
 @angular/material/form-field
-
-@angular/forms
-MIT
 
 ngx-color-picker
 MIT
@@ -644,6 +648,8 @@ SOFTWARE.
 @angular/cdk/scrolling
 
 @angular/material/card
+
+@angular/material/dialog
 
 zone.js
 MIT
