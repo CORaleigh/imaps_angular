@@ -651,6 +651,8 @@ SOFTWARE.
 
 @angular/material/dialog
 
+@angular/material/snack-bar
+
 zone.js
 MIT
 The MIT License
