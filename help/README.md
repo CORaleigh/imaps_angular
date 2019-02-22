@@ -4,3 +4,4 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 ## Whats New?
 ### UI (User Interface)
 - Dark/Light Mode
+![alt text](http://url/to/img.png)
