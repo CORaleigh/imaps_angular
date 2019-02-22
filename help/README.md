@@ -39,3 +39,16 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Legend stored in a separate widget, accessible with the button below the layer list button
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/legend.png" >
+### Property Info
+- No longer just a table, now separated into cards
+- Access Wake County real estate page by link in property card, no longer a separate tab
+- Access Google Streetview by link in property card, replaces the Streetview tool
+- Photos integrated into property info, no longer a separate tab.  Scroll through images if there are multiple.
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/propertyinfo.png" >
+- Deeds integrated into property info, no longer a separate tab.
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/deeds.png" >
+- Addresses integrated into property info, no longer a separate tab.
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/addresses.png" >
