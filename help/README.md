@@ -2,7 +2,7 @@
 New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS JavaScript API 4.x.
 
 ## Whats New?
-###[UI (User Interface)](#ui-user-interface)
+### [UI (User Interface)](#ui-user-interface)
 - [Dark/Light Mode](#darklight-mode)
 - [Tool Panel](#tool-panel)
 [Base Map Gallery](#base-map-gallery)
