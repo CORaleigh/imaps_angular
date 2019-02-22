@@ -28,3 +28,6 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Property labels can be toggled on an off by clicking the ... next to the Property layer.
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/labeloptions.png" >
+- Legend stored in a separate widget, accessible with the button below the layer list button
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/legend.png" >
