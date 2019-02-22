@@ -22,3 +22,6 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Layers are now grouped by category and sub-category
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/grouplayers.png" >
+- Access opacity and full extent options by clicking the ... next to the layer name.  Opacity is now up and down buttons, not a slider
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/layeroptions.png" >
