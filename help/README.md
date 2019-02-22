@@ -14,6 +14,9 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Accessible by clicking the  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/basemapbutton.png" width="30"> button in the upper right corner of the map
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/basemaps.png">
+- Property lines now easier to view on imagery base maps, changes to white.
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/propertylines.png">  
 ### Layer List
 - No longer taking up space in the right side panel
 - Accessible by clicking the  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/layerbutton.png" width="30"> button in the upper right corner of the map
