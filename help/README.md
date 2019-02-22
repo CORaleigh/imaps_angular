@@ -7,3 +7,6 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
   <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/darkmode.png" width="400">
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/lightmode.png" width="400">
+- Tool panel now full browser height, access by clicking the wrench icon in upper right corner
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/toolpanel.png" width="400">
