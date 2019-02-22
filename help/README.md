@@ -109,6 +109,15 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 #### Sketch
 - The sketch tool now supports setting the fill and line color, along with the width of the line.
 - Option to draw circles and rectangles
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/sketch.png" >
 #### Measure
-- The sketch tool now supports setting the fill and line color, along with the width of the line.
-- Option to draw circles and rectangles
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/area.png" >
+      <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/distance.png" >
+- Coordinate search tool integrated in measurement tool
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/coordinates.png" >
+      <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/coordinatesearch.png" >
