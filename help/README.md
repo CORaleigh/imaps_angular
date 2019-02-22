@@ -25,3 +25,6 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Access opacity and full extent options by clicking the ... next to the layer name.  Opacity is now up and down buttons, not a slider
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/layeroptions.png" >
+- Property labels can be toggled on an off by clicking the ... next to the Property layer.
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/labeloptions.png" >
