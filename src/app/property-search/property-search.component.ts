@@ -29,7 +29,6 @@ export class PropertySearchComponent implements OnInit {
   pinChanges:Subscription;
   reidChanges:Subscription;  
   streetChanges:Subscription;  
-
   searchForm: FormGroup = this.fb.group({searchGroup: ''});
   control: FormControl = new FormControl();
   accountList: any[] = [];
@@ -59,7 +58,6 @@ export class PropertySearchComponent implements OnInit {
   ngOnInit() {
     this.control.disable();
    disableBodyScroll(this.autoEl.nativeElement);
-
     this.shared.mapView.subscribe(mapView => {
       if (mapView) {
         this.mapView = mapView;
@@ -196,6 +194,8 @@ export class PropertySearchComponent implements OnInit {
   }
   getCondos(where: string, field: string) {
     this.property.getCondos(this.condoUrl + '/query', where, field).subscribe(result => {
+      debugger
+      this.property.fields = result.fields;
       if (result.features.length === 1) {
         let feature = result.features[0];
         this.shared.propertyInfo.next(result.features[0]);

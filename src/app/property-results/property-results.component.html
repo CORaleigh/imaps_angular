@@ -27,7 +27,19 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>PIN</th>
       <td mat-cell *matCellDef="let row">{{row.PIN_NUM}} {{row.PIN_EXT}}</td>
     </ng-container>
+    <ng-container matColumnDef="EXPORT" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef>
+            <button (click)="exportToCsv()" mat-icon-button>
+                <mat-icon>save_alt</mat-icon>
+              </button>
+            <a #exportCsv _target="_blank" download="mailing_labels.csv">
+          </a>
 
+        </th>
+        <td mat-cell *matCellDef="let row">
+          
+        </td>
+      </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 

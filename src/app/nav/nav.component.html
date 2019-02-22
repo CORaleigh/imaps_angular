@@ -19,7 +19,41 @@
    >
     <mat-icon aria-label="Side nav toggle icon">search</mat-icon>
   </button>
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="showDisclaimer()">Disclaimer</button>
+    <button mat-menu-item (click)="showFeedback()">Feedback</button>
+    <button mat-menu-item [matMenuTriggerFor]="links">Links</button>
+    <button mat-menu-item [matMenuTriggerFor]="help">Help</button>
+    <div mat-menu-item  (click)="$event.stopPropagation();">
 
+        <mat-slide-toggle 
+        class="example-margin"
+        color="primary"
+        [checked]="dark" (change)="toggleDarkMode($event);">
+          Dark Mode
+        </mat-slide-toggle>    
+      </div>
+  
+  </mat-menu>
+  
+  <mat-menu #links="matMenu">
+    <a href="https://www.raleighnc.gov" target="_blank" mat-menu-item>City of Raleigh</a>
+    <a href="https://www.wakegov.com" target="_blank" mat-menu-item>Wake County</a>
+    <button mat-menu-item [matMenuTriggerFor]="data">Data</button>
+  </mat-menu>
+  
+  <mat-menu #data="matMenu">
+      <a href="https://data.raleighnc.gov" target="_blank" mat-menu-item>Raleigh Open Data</a>
+      <a href="https://data-wake.opendata.arcgis.com" target="_blank" mat-menu-item>Wake Open Data</a>
+  </mat-menu>
+  
+  <mat-menu #help="matMenu">
+    <button mat-menu-item>Help</button>
+
+  </mat-menu>
 
   <!-- <button mat-button *ngIf="!loggedIn" (click)="logInClicked()">Login</button>
   <button mat-button *ngIf="loggedIn" (click)="logOutClicked()">Logout</button> -->

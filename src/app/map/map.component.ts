@@ -11,8 +11,8 @@
   limitations under the License.
 */
 
-import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
-import { loadModules } from 'esri-loader';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { loadModules, loadCss } from 'esri-loader';
 import esri = __esri;
 import { SharedService } from '../shared.service';
 import { PropertyService } from '../property.service';
@@ -20,6 +20,8 @@ import {Location} from '@angular/common';
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { ActivatedRoute, Router } from '@angular/router';
 import '../modernizr.js';
+import { MatSnackBar } from '@angular/material';
+import { OverlayContainer } from '@angular/cdk/overlay';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
@@ -43,7 +45,9 @@ export class MapComponent implements OnInit {
   private _center: Array<number> = [0.1278, 51.5074];
   private _basemap: string = 'streets';
   private _propertyLayer:esri.FeatureLayer;
+  private _propertyLabelFields:any[] = [];
   private _planBoundary:esri.FeatureLayer;
+  private _inRaleigh:boolean;
   private isTablet:boolean;
   private isHandset:boolean;
   private _layerList:esri.LayerList;
@@ -77,56 +81,55 @@ export class MapComponent implements OnInit {
     return this._basemap;
   }
 
-  constructor(public shared:SharedService, private property:PropertyService, private router:Router, private route: ActivatedRoute, private location:Location) { }
-  createWidget() {
+  constructor(public shared:SharedService, private property:PropertyService, private router:Router, private route: ActivatedRoute, private location:Location, private snackbar:MatSnackBar, private overlayContainer: OverlayContainer) { 
+    window.onpagehide = event => {
+      let layers = [];
+
+      shared.mapView.getValue().map.allLayers.forEach(layer => {
+        if (layer.visible) {
+          layers.push(layer.id);
+        }
+      });
+      localStorage.setItem('visibleLayers', layers.toString());      
+      localStorage.setItem('extent', JSON.stringify(shared.mapView.getValue().extent.toJSON()));    
+      localStorage.setItem('basemap', shared.mapView.getValue().map.basemap.portalItem.id);    
+    }
     
   }
+
   async initializeMap() {
     try {
       const [WebMap, 
         MapView, 
         config, 
         SimpleFillSymbol, 
-        Graphic, 
-        GraphicsLayer, 
-        GroupLayer, 
-        FeatureLayer,
-        ScaleBar, 
-        Fullscreen, 
-        Track, 
-        Compass, 
-        BasemapGallery, 
-        LayerList, 
-        Legend, 
-        Home, 
-        Search, 
-        Expand, 
-        Collection,
-        PortalBasemapsSource
+        Graphic,
+        jsonUtils,
+        Basemap,
+        esriRequest
       ] = await loadModules([
         'esri/WebMap',
         'esri/views/MapView',
         'esri/config',
-        'esri/symbols/SimpleFillSymbol',
+        'esri/symbols/SimpleFillSymbol', 
         'esri/Graphic',
-        'esri/layers/GraphicsLayer',
-        'esri/layers/GroupLayer',
-        'esri/layers/FeatureLayer',
-
-        "esri/widgets/ScaleBar",
-        "esri/widgets/Fullscreen",
-        "esri/widgets/Track",
-        "esri/widgets/Compass",
-        "esri/widgets/BasemapGallery",
-        "esri/widgets/LayerList",
-        "esri/widgets/Legend",
-        "esri/widgets/Home",
-        "esri/widgets/Search",
-        "esri/widgets/Expand",
-        "esri/core/Collection",
-        "esri/widgets/BasemapGallery/support/PortalBasemapsSource" 
+        "esri/geometry/support/jsonUtils",
+        'esri/Basemap',
+        'esri/request'
       ]);
 
+      esriRequest('https://maps.raleighnc.gov/arcgis/rest/services/Hosted/GIS_Application_Alerts/FeatureServer/0/query', {
+        query: {f:'json',where:"alert='true'", outFields:'*'}, responseType: 'json'
+      }).then(response => {
+        if (response.data.features.length) {
+          let ref = this.snackbar.open(response.data.features[0].attributes.message, 'Dismiss', {
+            verticalPosition: 'top',
+            panelClass: 'alert-snackbar'});
+          ref.onAction().subscribe(()=> {
+            ref.dismiss();
+          });
+        }
+      });
       config.portalUrl = this._portalUrl;
 
       // Set type of map
@@ -144,34 +147,27 @@ export class MapComponent implements OnInit {
         container: this.mapViewEl.nativeElement,
         map: map
       };
+      if(localStorage.getItem('extent')) {
+        mapViewProperties.extent = jsonUtils.fromJSON(JSON.parse(localStorage.getItem('extent'))) as esri.Extent;
+      }      
 
       const mapView: esri.MapView = new MapView(mapViewProperties);
+      
+   
 
-      let defineLayerListActions = function (event) {
 
-        if (event.item.layer.type != 'group') {
-          // event.item.panel = {
-          //   content: "legend",
-          //   open: false
-          // };
-          event.item.actionsSections = [
-            [{
-              title: "Increase opacity",
-              className: "esri-icon-up",
-              id: "increase-opacity"
-            }, {
-              title: "Decrease opacity",
-              className: "esri-icon-down",
-              id: "decrease-opacity"
-            }]
-          ];
-        }
-      };
 
       // All resources in the MapView and the map have loaded.
       // Now execute additional processes
       mapView.when(() => { 
-        this.groupLayers(mapView, GroupLayer);
+        if (localStorage.getItem('basemap')) {
+            mapView.map.basemap = new Basemap({
+              portalItem: {
+                id: localStorage.getItem('basemap')
+              }
+            });
+        }        
+        this.groupLayers(mapView);
       
         this.mapLoaded.emit(true);
         mapView.popup.watch('collapsed', collapsed => {
@@ -185,152 +181,441 @@ export class MapComponent implements OnInit {
      
           }
         });
+        this.addScalebar(mapView);
 
-        let scale:esri.ScaleBar = new ScaleBar({view:mapView});
-        mapView.ui.add(scale, "bottom-left");
-        if (Modernizr.fullscreen) {
-          let full:esri.Fullscreen = new Fullscreen({view:mapView});
-          mapView.ui.add(full, "top-left");
-        }
-        if (Modernizr.geolocation) {
-          let track:esri.Track = new Track({view:mapView});
-          mapView.ui.add(track, "top-left");
-        }
-        let compass:esri.Compass = new Compass({view:mapView});
-        mapView.ui.add(compass, "top-left");    
-        let clear:esri.Home = new Home({view:mapView});
-        clear.goToOverride = (view, params) => {
-          view.map.layers.forEach(layer => {
-            if (layer.type === 'graphics') {
-              (layer as esri.GraphicsLayer).removeAll();
-            }
+        this.addCompass(mapView).then(() => {
+          this.addTrack(mapView).then(() => {
+            this.addFullscreen(mapView).then(() => {
+              this.addClear(mapView);
+            });
           });
-          this.location.replaceState('/');
-
-          this.shared.propertyInfo.next(null);
-          this.shared.propertyResults.next([]);
-          return null;
-        };
-        
-        mapView.ui.add(clear, "top-left");    
-          //@ts-ignore
-          clear.domNode.classList.add('clear-button');        
-        setTimeout( () => {
-          //@ts-ignore
-          clear.domNode.setAttribute('aria-label', 'Clear graphics and selection');
-          //@ts-ignore
-
-          clear.domNode.setAttribute('title', 'Clear graphics and selection');
-
-        }, 500);
-        let searchWidget:esri.widgetsSearch = new Search({
-          view: mapView
         });
-        // Adds the search widget below other elements in
-        // the top left corner of the view
-        mapView.ui.add(searchWidget, "top-right");
+
+        this.addSearch(mapView).then(() => {
+          this.addExpandWidgets(mapView);
+        });
+
+        this.shared.mapView.next(mapView);
+        this.addSelectionLayers(mapView).then((layers) => {
+
+          let multiGraphics = layers[0];
+          let singleGraphics = layers[1];
+
+     
+          mapView.whenLayerView(singleGraphics).then( singleGraphicsView => {
+            mapView.whenLayerView(multiGraphics).then(multiGraphicsView => {
+              
+              mapView.map.reorder(multiGraphics, mapView.map.allLayers.length - 2);
+              mapView.map.reorder(singleGraphics, mapView.map.allLayers.length - 1);
+
+              mapView.map.allLayers.forEach(layer => {
+                if (localStorage.getItem('visibleLayers').split(',').indexOf(layer.id) > -1) {
+                  layer.visible = true;
+                }
+                if (layer.title.indexOf('Property') > -1 && layer.type === 'feature') {
+                  mapView.whenLayerView(layer).then((layerView: esri.FeatureLayerView) => {
+                    this._propertyLayer = layerView.layer;
+                    this.togglePropertyLineColor(mapView.map.basemap);
+                    if (this.route.routeConfig) {
+                      if (this.route.routeConfig.path === 'pin/:pin' || this.route.routeConfig.path === 'reid/:reid') { 
+                        this.route.paramMap.subscribe(params => {
+                          let url:string = '';
+                        //@ts-ignore
+                        mapView.map.tables.forEach(table => {
+                          if (table.title.indexOf('Condos') > -1) {
+                            url = table.url;
+                          }
+                        });
+                        if (params.get('pin')) {
+                          this.property.queryCondos(url, "PIN_NUM IN ('" + params.get('pin') + "')",'PIN_NUM');
+                        } else if (params.get('reid')) {
+                          this.property.queryCondos(url, "REID IN ('" + params.get('reid') + "')",'REID');
+      
+                        }
+      
+                        });  
+                      }
+                    }            
+                    mapView.on('hold', e => {
+                      if (!this.shared.sketchTool.activeTool && !this.shared.selectTool.activeTool) {
+
+                        let geometry = e.mapPoint;
+                        this._propertyLayer.queryFeatures({geometry: geometry, returnGeometry: true, outFields: ['OBJECTID']}).then(result => {
+                          let oids = [];
+                          result.features.forEach(feature => {
+                            oids.push(feature.attributes.OBJECTID);
+                            
+                          });
+                          this.shared.propertyIds.next(oids);
+        
+  
+                          this._propertyLayer.queryRelatedFeatures({relationshipId: 0, objectIds: oids, outFields: ['*']}).then(result => {
+                            let data = [];
+                            oids.forEach(oid => {
+                              if (result[oid]) {
+                                result[oid].features.forEach(f => {
+                                  data.push(f.attributes);
+                                });
+                              }
+                            });
+                            
+                            this.shared.propertyResults.next(data);
+                            if (data.length === 1) {
+                              this.shared.propertyInfo.next({attributes: data[0]});
+                            } 
+                          });
+                    
+                          });
+                      }
+                    });
+                    this.shared.propertyIds.subscribe(ids => {
+      
+                      if (ids.length > 0) {
+                        this._propertyLayer.queryFeatures({objectIds: ids, returnGeometry: true, outFields:['*'], outSpatialReference:mapView.spatialReference}).then(results => {
+                          mapView.goTo({target: results.features}, {duration: 2000});
+                          multiGraphics.removeAll();                 
+                          singleGraphics.removeAll();                         
+                          (mapView.map.findLayerById('selectGraphics') as esri.GraphicsLayer).removeAll();
+                          results.features.forEach(feature => {
+                            let g:esri.Graphic = new Graphic();
+                            g.geometry = feature.geometry;
+                            g.attributes = feature.attributes;
+                            let symbol:esri.SimpleFillSymbol = new SimpleFillSymbol(
+                            {
+                               color: [ 51,51, 204, 0 ],
+                               style: "solid",
+                               outline: {  // autocasts as new SimpleLineSymbol()   
+                                 color: "yellow",
+                                 width: 2
+                               }
+                             });
+                             g.symbol = symbol;
+                            multiGraphics.add(g);                         
+                          });                 
+                        })
+                      }
+                    });
+                    this.shared.propertyInfo.subscribe(info => {
+                      if (info) {
+                        this.location.replaceState('/reid/' + info.attributes.REID);
+                        //this.router.navigate(['/pin/' + info.attributes.PIN_NUM]);
+                        this.property.getProperties('https://maps.raleighnc.gov/arcgis/rest/services/Property/Property/FeatureServer/1', info.attributes.OBJECTID, 0).subscribe(result => {
+                          if (result.relatedRecordGroups[0].relatedRecords.length > 0) {
+                            this._propertyLayer.queryFeatures({objectIds: result.relatedRecordGroups[0].relatedRecords[0].attributes.OBJECTID, returnGeometry: true, outFields:['*'], outSpatialReference:mapView.spatialReference}).then(results => {
+                              mapView.goTo({target: results.features}, {duration: 2000});
+
+                              if (results.features[0].geometry) {
+                                setTimeout(() => {
+                                  this.addSingleSelection(results.features[0].clone().geometry, singleGraphics);
+                                },500);                                
+                              }                              
+         
+                              this.shared.selectedGraphic.next(results.features[0]);            
+                            })                      
+                          }
+                        });
+      
+                      }
+      
+                    })
+                  });
+                }
+              });
+            });
+          });
+
+        });
+
+ 
+        mapView.on('layerview-create', event => {
+
+          if (event.layer.title) {
+            
+          } else {
+            
+            event.layer.listMode = 'hide';
+          }
+        });
+
+      });
+    } catch (error) {
+      console.log('We have an error: ' + error);
+    }
+
+  }
+
+  async addSingleSelection(geometry, layer) {
+
+    try {
+      const [Graphic] = await loadModules([
+        'esri/Graphic'
+        ])  
+        layer.removeAll();
+        layer.add(new Graphic({geometry:geometry, symbol: {
+          type: 'simple-fill',
+          color: [ 51,51, 204, 0 ],
+          style: "solid",
+          outline: {  // autocasts as new SimpleLineSymbol()   
+            color: "red",
+            width: 2
+          }
+        }}));
+        return true;
+    } catch (error) {
+      console.log('We have an error: ' + error);
+      return false;
+
+    }   
+  }
+
+  async addSelectionLayers(mapView) {
+    try {
+      const [GraphicsLayer] = await loadModules([
+        'esri/layers/GraphicsLayer'
+        ])  
+        let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
+        let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics', listMode: 'hide'});
+        mapView.map.addMany([multiGraphics, singleGraphics]);
+        return [multiGraphics, singleGraphics];
+    } catch (error) {
+      console.log('We have an error: ' + error);
+      return false;
+
+    }
+  }
+
+  addTooltips(mapView, Graphic) {
+    mapView.on('pointer-move', event => {
+      mapView.hitTest(event).then(e => {
+        let features = e.results.filter(result => result.graphic.layer.title === 'multiGraphics');
+        if (features.length) {
+          let feature = features[0].graphic;
+          console.log(feature.attributes.OWNER);
+          let g = new Graphic({geometry: features[0].mapPoint, attributes:feature.attributes, symbol: {
+            type: "text",  // autocasts as new TextSymbol()
+            color: "white",
+            haloColor: "black",
+            haloSize: "1px",
+            text: feature.attributes.SITE_ADDRESS+'\n'+feature.attributes.OWNER,
+            xoffset: 3,
+            yoffset: 3,
+            font: {  // autocast as new Font()
+              size: 8,
+              family: "sans-serif",
+              weight: "bold"
+            }
+          }});
+          mapView.graphics.removeAll();
+          mapView.graphics.add(g);
+        } else {
+          mapView.graphics.removeAll();
+        }
+      });
+    });    
+  }
+
+  togglePropertyLineColor = basemap => {
+    let color:string = 'black';
+    if (basemap.title.indexOf('Imagery') > -1) {
+      color = 'white';
+    }
+    let renderer:esri.SimpleRenderer = (this._propertyLayer.renderer as esri.SimpleRenderer).clone();
+    
+    //@ts-ignore
+    renderer.symbol.outline.color = color;
+    this._propertyLayer.renderer = renderer;          
+  }
+
+  sortBasemaps = (a, b) => {
+     if (a.title < b.title) {
+       return 1;
+     }
+     if (a.title > b.title) {
+       return -1;
+     }
+     return 0;
+  }
+
+  filterBasemaps = mapView => {
+    this._planBoundary.queryFeatureCount({geometry: mapView.center}).then(count => {
+      if (this._inRaleigh != count > 0) {
+        (this._basemapGallery.source as esri.PortalBasemapsSource).filterFunction = event => {
+          if (count === 0) { 
+            return event.portalItem.tags.indexOf('Wake') > -1;
+          } else {
+            return true;
+          }
+        };
+        if (count === 0 && mapView.map.basemap.title.indexOf('Imagery') > -1 && mapView.map.basemap.portalItem.tags.indexOf('Wake') < 0) { 
+          let oldtitle = mapView.map.basemap.title;
+          mapView.map.basemap = this._basemapGallery.source.basemaps.getItemAt(this._basemapGallery.source.basemaps.length - 1);
+          this.snackbar.open(oldtitle + ' base map not available for this area, switched to ' + mapView.map.basemap.title, '', {
+            duration: 3000
+          });
+        }
+      }
+      this._inRaleigh = count > 0;
+    }).then(result => {
+      this._basemapGallery.viewModel.source.basemaps.sort(this.sortBasemaps);
+      this._basemapGallery.viewModel.source.basemaps.forEach((bm,i) => {
+        if (bm.title.indexOf('Base') > -1) {
+          this._basemapGallery.viewModel.source.basemaps.splice(i, 1);
+          this._basemapGallery.viewModel.source.basemaps.unshift(bm);
+        }
+      });
+    });
+  }
+
+  async addBasemapGallery(mapView, Expand) {
+    try {
+      const [BasemapGallery, 
+        PortalBasemapsSource, 
+        FeatureLayer
+        ] = await loadModules([
+          'esri/widgets/BasemapGallery',
+          'esri/widgets/BasemapGallery/support/PortalBasemapsSource',
+          'esri/layers/FeatureLayer'
+        ])
         this._planBoundary = new FeatureLayer({
           portalItem: { 
             id: "a64564abdc1d41bcbb8767ce893c2967"
           }  
-        });
+        });        
 
-        mapView.map.watch('basemap', basemap => {
-          let color:string = 'black';
-          if (basemap.title.indexOf('Imagery') > -1) {
-            color = 'white';
-          }
-          let renderer:esri.SimpleRenderer = (this._propertyLayer.renderer as esri.SimpleRenderer).clone();
-          
+      mapView.map.watch('basemap', this.togglePropertyLineColor);
+
+      this._basemapGallery = new BasemapGallery(
+        {view:mapView,
+          source: new PortalBasemapsSource({
+            query: "id:" + this._raleighGroupId
+          }),
+          container: document.createElement("div"),
+        });
+        let expand:esri.Expand = new Expand({
+          view: mapView, 
+          expandIconClass: "esri-icon-basemap",
+          group: 'top-right',
           //@ts-ignore
-          renderer.symbol.outline.color = color;
-          this._propertyLayer.renderer = renderer;          
-        });
+          content: this._basemapGallery.domNode}
+        );          
+         //@ts-ignore
+         disableBodyScroll(this._basemapGallery.domNode);   
+         expand.watch('expanded', expanded => {
+          //@ts-ignore
+           this.expandPanelExpanded(expanded, this._basemapGallery);
+         });
 
-        this._basemapGallery = new BasemapGallery(
-          {view:mapView,
-            source: new PortalBasemapsSource({
-              query: "id:" + this._raleighGroupId
-            }),
-            container: document.createElement("div"),
+        
+         setTimeout(() => {
+          this.filterBasemaps(mapView);
+        });
+         
+
+      mapView.ui.add(expand, "top-right");   
+
+      mapView.watch('stationary', stationary => {
+        if (stationary) {
+          setTimeout(() => {
+            this.filterBasemaps(mapView);
           });
-          let expand:esri.Expand = new Expand({
-            view: mapView, 
-            expandIconClass: "esri-icon-basemap",
-            group: 'top-right',
-            //@ts-ignore
-            content: this._basemapGallery.domNode}
-          );          
-           //@ts-ignore
-           disableBodyScroll(this._basemapGallery.domNode);   
-           expand.watch('expanded', expanded => {
-            //@ts-ignore
-             this.expandPanelExpanded(expanded, this._basemapGallery);
-           });
-           let basemapExpand = expand;
 
-          
-          
-        mapView.ui.add(expand, "top-right");   
-        mapView.watch('updating', updating => {
-          if (!updating) {
-            
-            this._planBoundary.queryFeatureCount({geometry: mapView.center}).then(count => {
-              
-              let groupid = 'id:f2360ebbfe5242a299551e9e7323ef3e';
-              if (count === 0) {
-                groupid = 'id:2f1f161b96c5406984546432c3d501e1';
-              }
-              //@ts-ignore
-              if (this._basemapGallery.source.query != groupid) {                
-                this._basemapGallery = new BasemapGallery(
-                  {view:mapView,
-                    source: new PortalBasemapsSource({
-                      query: groupid
-                    }),
-                    container: document.createElement("div"),
-                  });       
-               
-                basemapExpand.content = this._basemapGallery;
-              }
-            });
+        }
+      });
+      return true;
+    } catch (error) {
+      console.log('We have an error: ' + error);
+      return false;
+
+    }
+  }  
+  
+  
+
+  async addLayerList(mapView, Expand) {
+    try {
+      const [LayerList] = await loadModules([
+          'esri/widgets/LayerList'
+        ])  
+ 
+        let defineLayerListActions = function (event) {
+          event.item.actionsSections = [];
+          if (event.item.layer.title.indexOf('Property') > -1 && event.item.layer.type != 'group') {
+            event.item.actionsSections.push([
+              {
+                title: "Label By PIN",
+                className: "esri-icon-checkbox-unchecked",
+                id: "label-PIN_NUM",
+                type: "toggle"
+              },
+              {
+                title: "Label By Address",
+                className: "esri-icon-checkbox-unchecked",
+                id: "label-SITE_ADDRESS",
+                type: "toggle"
+              },
+              {
+                title: "Label By REID",
+                className: "esri-icon-checkbox-unchecked",
+                id: "label-REID",
+                type: "toggle"
+              }          
+            ]);
+
           }
-        });
+          if (event.item.layer.type != 'group') {
+            event.item.actionsSections.push(
+              [{
+                title: "Increase opacity",
+                className: "esri-icon-up",
+                id: "increase-opacity"
+              }, {
+                title: "Decrease opacity",
+                className: "esri-icon-down",
+                id: "decrease-opacity"
+              }]);
+              event.item.actionsSections.push([
+              {
+                title: "Go to full extent",
+                className: "esri-icon-zoom-out-fixed",
+                id: "full-extent"
+              }              
+              ]);
 
+          }
+        };      
         this._layerList = new LayerList(
           {view:mapView,
             container: document.createElement("div"),
             listItemCreatedFunction: defineLayerListActions
           });
-
-        expand = new Expand({
+  
+          let expand:esri.Expand = new Expand({
             view: mapView, 
             expandIconClass: "esri-icon-layers",
             group: 'top-right',
-
+  
             //@ts-ignore
             content:  this._layerList.domNode}
           );
-
+  
           expand.watch('expanded', expanded => {
             //@ts-ignore
              this.expandPanelExpanded(expanded, this._layerList);
            });
-
-
+  
+  
            //@ts-ignore
           disableBodyScroll(this._layerList.domNode);
-
-          this._layerList.on("trigger-action", function(event) {
-
+  
+          this._layerList.on("trigger-action", event => {
+  
             // Capture the action id.
             var id = event.action.id;
-  
             if (id === "full-extent") {
   
               // if the full-extent action is triggered then navigate
               // to the full extent of the visible layer
-              mapView.goTo(event.item.layer.fullExtent);
+              mapView.goTo({target: event.item.layer.fullExtent, scale: event.item.layer.minScale});
   
             } else if (id === "information") {
   
@@ -347,7 +632,7 @@ export class MapComponent implements OnInit {
                 event.item.layer.opacity += 0.1;
               } else {
                 event.item.layer.opacity = 1;
-
+  
               }
             } else if (id === "decrease-opacity") {
   
@@ -358,11 +643,52 @@ export class MapComponent implements OnInit {
                 event.item.layer.opacity -= 0.1;
               } else {
                 event.item.layer.opacity = 0;
+  
+              }
+            } 
+            if (id.indexOf('label-') > -1) {
+              
+              let fieldName = id.split('-')[1];
+              if(event.action.value) {
+                this._propertyLabelFields.push("$feature." + fieldName);           
+              } else {
+                this._propertyLabelFields.splice(this._propertyLabelFields.indexOf("$feature." + fieldName), 1);
 
               }
-            }
+
+
+              let labelClass:esri.LabelClass = {
+                labelExpressionInfo: { expression: "return Concatenate([" + this._propertyLabelFields.toString() + "], TextFormatting.NewLine);" },
+                symbol: {
+                  type: "text",  // autocasts as new TextSymbol()
+                  //@ts-ignore
+                  color: "black",
+                  haloSize: 1,
+                  haloColor: "white"
+                },
+              
+              };
+
+              this._propertyLayer.labelingInfo = [labelClass];
+            }     
           });
-        mapView.ui.add(expand, "top-right");  
+        mapView.ui.add(expand, "top-right");    
+        return true;
+
+              
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+
+      }
+  }      
+
+  async addLegend(mapView, Expand) {
+    try {
+      const [Legend] = await loadModules([
+          'esri/widgets/Legend'
+        ])  
+ 
         const legend:esri.Legend = new Legend({
           view: mapView,
           style: "classic",
@@ -373,9 +699,9 @@ export class MapComponent implements OnInit {
           content: legend.domNode,
           view: mapView,
           group: 'top-right',
-
+  
           expandIconClass: "esri-icon-layer-list",
-
+  
           expanded: false
         });
         legendExpand.watch('expanded', expanded => {
@@ -383,243 +709,195 @@ export class MapComponent implements OnInit {
          });
         //@ts-ignore
         disableBodyScroll(legend.domNode);         
-        mapView.ui.add(legendExpand, "top-right");                   
-        this.shared.mapView.next(mapView);
-        let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
-        let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics', listMode: 'hide'});
-        mapView.map.addMany([multiGraphics, singleGraphics]);
-        // mapView.on('pointer-move', event => {
-        //   mapView.hitTest(event).then(e => {
-        //     let features = e.results.filter(result => result.graphic.layer.title === 'multiGraphics');
-        //     if (features.length) {
-        //       let feature = features[0].graphic;
-        //       console.log(feature.attributes.OWNER);
-        //       let g = new Graphic({geometry: features[0].mapPoint, attributes:feature.attributes, symbol: {
-        //         type: "text",  // autocasts as new TextSymbol()
-        //         color: "white",
-        //         haloColor: "black",
-        //         haloSize: "1px",
-        //         text: feature.attributes.SITE_ADDRESS+'\n'+feature.attributes.OWNER,
-        //         xoffset: 3,
-        //         yoffset: 3,
-        //         font: {  // autocast as new Font()
-        //           size: 8,
-        //           family: "sans-serif",
-        //           weight: "bold"
-        //         }
-        //       }});
-        //       mapView.graphics.removeAll();
-        //       mapView.graphics.add(g);
-        //     } else {
-        //       mapView.graphics.removeAll();
-        //     }
-        //   });
-        // });
-        mapView.on('layerview-create', event => {
-          console.log(event.layer.title);
-          console.log(event.layer.type);
+        mapView.ui.add(legendExpand, "top-right");     
+        return true;
 
-          if (event.layer.title) {
-            
-          } else {
-            debugger
-            event.layer.listMode = 'hide';
-          }
-        });
-        mapView.map.allLayers.forEach(layer => {
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+  }      
 
-          if (layer.title.indexOf('Property') > -1) {
-            mapView.whenLayerView(layer).then((layerView: esri.FeatureLayerView) => {
-              this._propertyLayer = layerView.layer;
-              if (this.route.routeConfig) {
-                if (this.route.routeConfig.path === 'pin/:pin' || this.route.routeConfig.path === 'reid/:reid') { 
-                  this.route.paramMap.subscribe(params => {
-                    let url:string = '';
-                  //@ts-ignore
-                  mapView.map.tables.forEach(table => {
-                    if (table.title.indexOf('Condos') > -1) {
-                      url = table.url;
-                    }
-                  });
-                  if (params.get('pin')) {
-                    this.property.queryCondos(url, "PIN_NUM IN ('" + params.get('pin') + "')",'PIN_NUM');
-                  } else if (params.get('reid')) {
-                    this.property.queryCondos(url, "REID IN ('" + params.get('reid') + "')",'REID');
-
-                  }
-
-                  });  
-                }
-              }            
-              mapView.on('hold', e => {
-                let geometry = e.mapPoint;
-                this._propertyLayer.queryFeatures({geometry: geometry, returnGeometry: true, outFields: ['OBJECTID']}).then(result => {
-                  let oids = [];
-                  result.features.forEach(feature => {
-                    oids.push(feature.attributes.OBJECTID);
-                    
-                  });
-                  this.shared.propertyIds.next(oids);
-                  singleGraphics.removeAll();
-                  multiGraphics.removeAll();
-                  (mapView.map.findLayerById('selectGraphics') as esri.GraphicsLayer).removeAll();
-                  if (geometry) {
-                    singleGraphics.add(new Graphic({geometry:geometry, symbol: {
-                      type: 'simple-fill',
-                      color: [ 51,51, 204, 0 ],
-                      style: "solid",
-                      outline: {  // autocasts as new SimpleLineSymbol()   
-                        color: "red",
-                        width: 2
-                      }
-                    }}));
-                  }
-                  this._propertyLayer.queryRelatedFeatures({relationshipId: 0, objectIds: oids, outFields: ['*']}).then(result => {
-                    let data = [];
-                    oids.forEach(oid => {
-                      if (result[oid]) {
-                        result[oid].features.forEach(f => {
-                          data.push(f.attributes);
-                        });
-                      }
-                    });
-                    
-                    this.shared.propertyResults.next(data);
-                    if (data.length === 1) {
-                      this.shared.propertyInfo.next({attributes: data[0]});
-                    } 
-                  });
-            
-                  });
-              });
-              this.shared.propertyIds.subscribe(ids => {
-
-                if (ids.length > 0) {
-                  layerView.layer.queryFeatures({objectIds: ids, returnGeometry: true, outFields:['*'], outSpatialReference:mapView.spatialReference}).then(results => {
-                    mapView.goTo({target: results.features}, {duration: 2000});
-                    multiGraphics.removeAll();                         
-                    singleGraphics.removeAll();
-                    results.features.forEach(feature => {
-                      let g:esri.Graphic = new Graphic();
-                      g.geometry = feature.geometry;
-                      g.attributes = feature.attributes;
-                      let symbol:esri.SimpleFillSymbol = new SimpleFillSymbol(
-                      {
-                         color: [ 51,51, 204, 0 ],
-                         style: "solid",
-                         outline: {  // autocasts as new SimpleLineSymbol()   
-                           color: "yellow",
-                           width: 2
-                         }
-                       });
-                       g.symbol = symbol;
-                      multiGraphics.add(g);                         
-                    });
-                    mapView.map.reorder(mapView.map.findLayerById('singleGraphics'), 0);
-                    mapView.map.reorder(mapView.map.findLayerById('multiGraphics'), 1);                    
-                  })
-                }
-              });
-              this.shared.propertyInfo.subscribe(info => {
-                if (info) {
-                  this.location.replaceState('/reid/' + info.attributes.REID);
-                  //this.router.navigate(['/pin/' + info.attributes.PIN_NUM]);
-                  this.property.getProperties('https://maps.raleighnc.gov/arcgis/rest/services/Property/Property/FeatureServer/1', info.attributes.OBJECTID, 0).subscribe(result => {
-                    if (result.relatedRecordGroups[0].relatedRecords.length > 0) {
-                      layerView.layer.queryFeatures({objectIds: result.relatedRecordGroups[0].relatedRecords[0].attributes.OBJECTID, returnGeometry: true, outFields:['*'], outSpatialReference:mapView.spatialReference}).then(results => {
-                        mapView.goTo({target: results.features}, {duration: 2000});
-                        let g:esri.Graphic = new Graphic();
-                        g.geometry = results.features[0].geometry;
-                        let symbol:esri.SimpleFillSymbol = new SimpleFillSymbol(
-                        {
-                           color: [ 51,51, 204, 0 ],
-                           style: "solid",
-                           outline: {  // autocasts as new SimpleLineSymbol()   
-                             color: "red",
-                             width: 2
-                           }
-                         });
-                         g.symbol = symbol;
-                         singleGraphics.removeAll();  
-                        singleGraphics.add(g);    
-                        mapView.map.reorder(mapView.map.findLayerById('singleGraphics'), 0);
-                        mapView.map.reorder(mapView.map.findLayerById('multiGraphics'), 1);
-   
-                        this.shared.selectedGraphic.next(g);            
-                      })                      
-                    }
-                  });
-
-                }
-
-              })
-            });
-          }
+  async addExpandWidgets(mapView) {
+    try {
+      const [Expand] = await loadModules([
+          'esri/widgets/Expand'
+        ])  
+      this.addBasemapGallery(mapView, Expand).then(() => {
+        this.addLayerList(mapView, Expand).then(() => {
+          this.addLegend(mapView, Expand);
         });
       });
     } catch (error) {
       console.log('We have an error: ' + error);
     }
+  }  
 
-  }
 
-  groupLayers(mapView, GroupLayer) {
-    let i = 0;
-    let groupLayer:esri.GroupLayer;
-    let subLayer:esri.GroupLayer;
-    do  {
-      let layer = mapView.map.layers.getItemAt(i);
-      let levels = layer.title.split('|').length
-      if (levels > 0 && layer.type === 'feature') {
-        let groupId = layer.title.substr(0, layer.title.indexOf('|'));
-        layer.title = layer.title.replace(groupId + '|', '');
-        if (mapView.map.findLayerById(groupId)) {
+  async addSearch(mapView) {
+    try {
+      const [Search] = await loadModules([
+          'esri/widgets/Search'
+        ])  
+        let search:esri.widgetsSearch = new Search({view: mapView});
+        mapView.ui.add( search, "top-right"); 
+        search.on('suggest-complete', e => {
+          if (document.getElementsByClassName('esri-search__suggestions-menu').length) {
+            disableBodyScroll(document.getElementsByClassName('esri-search__suggestions-menu')[0])
+          };
+        });
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+  }        
 
-        } else {
-          groupLayer = new GroupLayer({title: groupId, id: groupId});
-          mapView.map.add(groupLayer);
+  async addClear(mapView) {
+    try {
+      const [Home] = await loadModules([
+          'esri/widgets/Home'
+        ])  
+        let clear:esri.Home = new Home({view:mapView});
+        clear.goToOverride = (view, params) => {
+          view.map.layers.forEach(layer => {
+            if (layer.type === 'graphics') {
+              (layer as esri.GraphicsLayer).removeAll();
+            }
+          });
+          this.location.replaceState('/');
+      
+          this.shared.propertyInfo.next(null);
+          this.shared.propertyResults.next([]);
+          return null;
+        };
+        mapView.ui.add(clear, "top-left");   
+        //@ts-ignore
+        clear.domNode.classList.add('clear-button');        
+        setTimeout( () => {
+          //@ts-ignore
+          clear.domNode.setAttribute('aria-label', 'Clear graphics and selection');
+          //@ts-ignore
+  
+          clear.domNode.setAttribute('title', 'Clear graphics and selection');
+  
+        }, 500);      
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+    }
+  async addCompass(mapView) {
+    try {
+      const [Compass] = await loadModules([
+          'esri/widgets/Compass'
+        ])  
+        mapView.ui.add(new Compass({view:mapView}), "top-left");      
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+    }
+
+  async addTrack(mapView) {
+    if (Modernizr.geolocation) {
+      try {
+        const [Track] = await loadModules([
+            'esri/widgets/Track'
+          ])  
+          mapView.ui.add(new Track({view:mapView}), "top-left");
+          return true;   
+        } catch (error) {
+          console.log('We have an error: ' + error);
+          return false;
         }
-        if (layer.title.indexOf('|') > -1) {
-          let subId = layer.title.substr(0, layer.title.indexOf('|'));
-          layer.title = layer.title.replace(subId + '|', '');
-          if (mapView.map.findLayerById(subId)) {
-            mapView.map.findLayerById(subId).add(layer);
-            i--;
+      } else {
+        return true;
+      }
+  }     
+  async addFullscreen(mapView) {
+    if (Modernizr.fullscreen) {
+      try {
+        const [Fullscreen] = await loadModules([
+            'esri/widgets/Fullscreen'
+          ])  
+          mapView.ui.add(new Fullscreen({view:mapView}), "top-left"); 
+          return true;   
+        } catch (error) {
+          console.log('We have an error: ' + error);
+          return false;
+        }
+      } else {
+        return true;
+      }
+  }     
+
+
+
+  addScalebar(mapView) {
+    loadModules(['esri/widgets/ScaleBar'])
+    .then(([ScaleBar]) => { 
+      let scale:esri.ScaleBar = new ScaleBar({view:mapView});
+      mapView.ui.add(scale, "bottom-left"); 
+      return true;
+     
+    })
+    .catch(err => {
+      // handle any errors
+      console.error(err);
+      return false;
+
+    });
+  }      
+  groupLayers(mapView) {
+    loadModules(['esri/layers/GroupLayer'])
+    .then(([GroupLayer]) => { 
+      let i = 0;
+      let groupLayer:esri.GroupLayer;
+      let subLayer:esri.GroupLayer;
+      do  {
+        let layer = mapView.map.layers.getItemAt(i);
+        let levels = layer.title.split('|').length
+        if (levels > 0 && (layer.type === 'feature' || layer.type === 'map-image')) {
+          let groupId = layer.title.substr(0, layer.title.indexOf('|'));
+          layer.title = layer.title.replace(groupId + '|', '');
+          if (mapView.map.findLayerById(groupId)) {
+  
           } else {
-            subLayer = new GroupLayer({title: subId, id: subId});
-            subLayer.add(layer);
-            mapView.map.findLayerById(groupId).add(subLayer);
-            i--;
+            groupLayer = new GroupLayer({title: groupId, id: groupId});
+            mapView.map.add(groupLayer);
           }
+          if (layer.title.indexOf('|') > -1) {
+            let subId = layer.title.substr(0, layer.title.indexOf('|'));
+            layer.title = layer.title.replace(subId + '|', '');
+            if (mapView.map.findLayerById(subId)) {
+              layer.visible = true;
+              mapView.map.findLayerById(subId).add(layer);
+              i--;
+            } else {
+              subLayer = new GroupLayer({title: subId, id: subId, visible: false});
+              layer.visible = true;
+              subLayer.add(layer);
+              mapView.map.findLayerById(groupId).add(subLayer);
+              i--;
+            }
+  
+  
+          } else {
+            groupLayer.add(layer);
+            i--;
+  
+          }
+        
+      } i++;} while (i < mapView.map.layers.length - 1);
+    })
+    .catch(err => {
+      // handle any errors
+      console.error(err);
+    });
 
-
-        } else {
-          groupLayer.add(layer);
-          i--;
-
-        }
-      // }
-
-
-      //   if (layer.title.indexOf('|') > -1 && layer.type === 'feature') {
-      //     let groupId = layer.title.substr(0, layer.title.indexOf('|'));
-      //     layer.title = layer.title.replace(groupId + '|', '');
-      //     if (mapView.map.findLayerById(groupId)) {
-            
-      //       (mapView.map.findLayerById(groupId) as esri.GroupLayer).add(layer);
-      //       i--;
-
-      //     } else {
-      //       groupLayer = new GroupLayer({title: groupId, id: groupId});
-      //       layer.title = layer.title.replace(groupId + '|', '');
-      //       mapView.map.add(groupLayer);
-            
-
-      //       groupLayer.add(layer);
-      //       i--;
-      //     }
-
-    } i++;} while (i < mapView.map.layers.length - 1);
   }
 
   expandPanelExpanded(expanded, widget) {
@@ -645,6 +923,7 @@ export class MapComponent implements OnInit {
  
 
   ngOnInit() {
+
     disableBodyScroll(this.mapViewEl.nativeElement);
     this.shared.isHandset$.subscribe(val => {
       this.isHandset = val;
@@ -653,8 +932,9 @@ export class MapComponent implements OnInit {
       this.isTablet = val;
     });    
     this.initializeMap();
-     
-
+  
+    
 }
+
 
 }

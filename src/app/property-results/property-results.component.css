@@ -37,7 +37,16 @@
   margin:2px;
 }
 
+.mat-column-EXPORT td{
+  width: 0;
+  margin:0;
+}
 
+.mat-column-EXPORT {
+
+  padding-right:0 !important;
+
+}
 
 td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type, th.mat-header-cell:first-of-type {
   padding-left: 0px;

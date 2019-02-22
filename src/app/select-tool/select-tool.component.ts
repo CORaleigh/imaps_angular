@@ -13,7 +13,9 @@ export class SelectToolComponent implements OnInit {
   distance: number = 0;
   private _mapView:esri.MapView;
   private _propertyLayer:esri.FeatureLayer;
-  private _select:esri.Sketch;
+  _select:esri.Sketch;
+  private _doubleClickHandler:IHandle;
+  private _lastTool:string;
   constructor(public shared:SharedService) { }
 
   ngOnInit() {
@@ -33,11 +35,12 @@ export class SelectToolComponent implements OnInit {
   
   async initialize() {
     try {
-      const [SimpleFillSymbol, Graphic, GraphicsLayer, Sketch, geometryEngine, Color] = await loadModules([
+      const [SimpleFillSymbol, Graphic, GraphicsLayer, Sketch, Multipoint, geometryEngine, Color] = await loadModules([
         'esri/symbols/SimpleFillSymbol',
         'esri/Graphic',
         'esri/layers/GraphicsLayer',
         "esri/widgets/Sketch",
+        "esri/geometry/Multipoint",
         "esri/geometry/geometryEngine",
         "esri/Color"
 
@@ -55,25 +58,57 @@ export class SelectToolComponent implements OnInit {
       
         this._select = new Sketch({layer:layer, view: this._mapView, container:this.selectEl.nativeElement});
         this._select.watch('activeTool', tool => {
-          
           if (['point','polyline','polygon','circle','rectangle'].indexOf(tool) > -1) {
             
-            this.shared.sketchTool.reset();
-          }
+            if (this._doubleClickHandler) {
+              this._doubleClickHandler.remove();
+            }
+            if (tool === 'point') {
+              this._doubleClickHandler = this._mapView.on('double-click', event => {
+                let geometry:esri.Multipoint = new Multipoint();
+              
+                geometry.spatialReference = this._mapView.spatialReference;
+                geometry.addPoint(event.mapPoint);
+                this._select.layer.graphics.forEach(g => {
+                  geometry.addPoint(g.geometry as esri.Point);
+
+                });
+                this.selectCompleted(geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+                this.shared.sketchTool.reset();
+
+              });
+            } else {
+              this.shared.sketchTool.reset();
+
+            }
+          } 
+          this._lastTool = tool;
+
         });
         this.shared.selectTool = this._select;
         this._select.on('create', (event) => {
         if (event.state === 'complete' ) {
-          this.selectCompleted(event, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+          if (this._select.activeTool === 'point' || this._lastTool === 'point') {
+            this._select.create('point');
+          } else {
+            this.selectCompleted(event.graphic.geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+
+          }
   
         } else if (event.state === 'start') {
           layer.removeAll();
         }
       });
       this._select.on('update', (event) => {
+        
         if (event.state === 'complete' ) {
-          this.selectCompleted(event, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
-  
+    
+          if (this._select.activeTool === 'point' || this._lastTool === 'point') {
+
+          } else {
+            this.selectCompleted(event.graphic.geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+
+          }  
         } else if (event.state === 'start') {
           layer.removeAll();
         }
@@ -84,8 +119,11 @@ export class SelectToolComponent implements OnInit {
 
 
   }
-  selectCompleted(event, geometryEngine, Graphic, select, SimpleFillSymbol, propertyLayer) {
+
+ 
+  selectCompleted(geometry, geometryEngine, Graphic, select, SimpleFillSymbol, propertyLayer) {
     this.shared.propertyInfo.next(null);
+    this._select.reset();
     let symbol:esri.SimpleFillSymbol = new SimpleFillSymbol(
       {
          color: [ 51,51, 204, 0 ],
@@ -95,12 +133,12 @@ export class SelectToolComponent implements OnInit {
            width: 2
          }
        });    
-    let geometry = event.graphic.geometry;
     if (this.distance > 0) {
-      geometry = geometryEngine.buffer(event.graphic.geometry, this.distance, 'feet');
+      geometry = geometryEngine.buffer(geometry, this.distance, 'feet');
 
     }
-    event.graphic.symbol = symbol;
+
+    
  
     propertyLayer.queryFeatures({geometry: geometry, returnGeometry: true, outFields: ['OBJECTID']}).then(result => {
       let oids = [];
@@ -111,9 +149,9 @@ export class SelectToolComponent implements OnInit {
       this.shared.propertyIds.next(oids);
       select.layer.removeAll();
       if (geometry) {
-        select.layer.add(new Graphic({geometry:geometry, symbol: event.graphic.symbol}));
+        select.layer.add(new Graphic({geometry:geometry}));
       } else {
-        select.layer.add(event.graphic);
+       // select.layer.add(event.graphic);
 
       }
       propertyLayer.queryRelatedFeatures({relationshipId: 0, objectIds: oids, outFields: ['*']}).then(result => {

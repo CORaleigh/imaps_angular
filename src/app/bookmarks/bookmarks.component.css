@@ -1,0 +1,13 @@
+.example-full-width {
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+span.esri-bookmarks_bookmark-remove{
+    height: 30px;
+    width: 30px;
+}
+span.esri-bookmarks_bookmark-remove:before {
+    content: "\e900";
+    color: inherit;
+}

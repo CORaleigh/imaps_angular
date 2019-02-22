@@ -4,7 +4,7 @@ import { PropertyResultsDataSource } from './property-results-datasource';
 import { SharedService } from '../shared.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-
+import { PropertyService } from '../property.service';
 @Component({
   selector: 'app-property-results',
   templateUrl: './property-results.component.html',
@@ -13,17 +13,23 @@ import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'bo
 export class PropertyResultsComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('exportCsv') private exportCsvEl: ElementRef;
+
   @ViewChild('resultTable') private tableEl: ElementRef;
 
   dataSource: PropertyResultsDataSource;
-  constructor(private shared:SharedService) {}
+  constructor(private shared:SharedService, private property:PropertyService) {}
   selection:SelectionModel<any> = new SelectionModel<any>(false, []);    
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['select','SITE_ADDRESS', 'OWNER', 'PIN_NUM'];
+  displayedColumns = ['select','SITE_ADDRESS', 'OWNER', 'PIN_NUM', 'EXPORT'];
   rowClicked(row) {
     this.shared.propertyInfo.next({attributes: row});
   };
+  exportToCsv() {
+    debugger
+    this.property.exportCsv(this.property.fields, this.dataSource.data, this.exportCsvEl.nativeElement);
+  }
   ngOnInit() {
    // disableBodyScroll(this.tableEl.nativeElement);
     this.dataSource = new PropertyResultsDataSource(this.paginator, this.sort, []);
@@ -39,6 +45,7 @@ export class PropertyResultsComponent implements OnInit {
           }
         }
         this.dataSource = new PropertyResultsDataSource(this.paginator, this.sort, data);
+
       }
     });   
   }

@@ -1,4 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { loadModules } from 'esri-loader';
+import esri = __esri;
 import { SharedService } from '../shared.service';
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
@@ -22,16 +24,16 @@ export class PropertyInfoComponent implements OnInit {
   @ViewChild('propertyInfo') private infoEl: ElementRef;
   cardWidth:number;
   SWIPE_ACTION = { LEFT: 'swipeleft', RIGHT: 'swiperight' };
+  theme: string = 'light-theme';
 
   ngOnInit() {
-
     this.shared.propertyTabIndex.subscribe(index => {
       if (index === 1) {
         setTimeout(() => {
           this.cardWidth = this.infoEl.nativeElement.offsetWidth - 62;
         });
       }
-    })
+    });
     disableBodyScroll(this.infoEl.nativeElement);       
      
 
@@ -58,13 +60,27 @@ export class PropertyInfoComponent implements OnInit {
   openLink(url) {
     window.open(url, '_blank');
   }
-  openGoogleStreetview() {
-    console.log(this.shared.selectedGraphic.getValue().geometry);
-    let lat =this.shared.selectedGraphic.getValue().geometry.centroid.latitude;
-    let lng =this.shared.selectedGraphic.getValue().geometry.centroid.longitude;
-    let url = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lat+','+lng;
-    window.open(url, '_blank');
-  }
+ 
+
+  async openGoogleStreetview(mapView) {
+    try {
+
+
+      const [projection, SpatialReference] = await loadModules(["esri/geometry/projection", "esri/geometry/SpatialReference"])  
+        let trans = projection.getTransformation(this.shared.selectedGraphic.getValue().geometry.spatialReference, new SpatialReference(4326));
+        let geom = projection.project(this.shared.selectedGraphic.getValue().geometry.centroid, new SpatialReference(4326), trans);
+        //@ts-ignore
+        let lat = geom.latitude;
+        //@ts-ignore
+        let lng = geom.longitude;
+        let url = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lat+','+lng;
+        window.open(url, '_blank');
+    } catch (error) {
+      console.log('We have an error: ' + error);
+    }
+  }  
+
+
   scroll(el) {
     if (el === 'Property') {
       this.propertyEl.nativeElement.scrollIntoView();

@@ -10,7 +10,7 @@ import { SharedService } from './shared.service';
   providedIn: 'root'
 })
 export class PropertyService {
-
+  fields:esri.Field[] = [];
   constructor(private http:HttpClient, public shared:SharedService) { }
 
   getRelationshipIds (url:string) {
@@ -108,6 +108,7 @@ export class PropertyService {
 
   queryCondos(url:string, where: string, field: string) {
     this.getCondos(url + '/query', where, field).subscribe(result => {
+      this.fields = result.fields;
       if (result.features.length === 1) {
         let feature = result.features[0];
         this.shared.propertyInfo.next(result.features[0]);
@@ -138,4 +139,45 @@ export class PropertyService {
       });
     });
   }
+
+  exportCsv(fields:any[], attributes:any[], element:any) {
+    let csv:string = "data:text/csv;charset=utf-8;"//,Owner,Address 1,Address 2,Address 3\r\n";
+    fields.forEach(field => {
+      csv += "," + field.alias;
+    });
+    csv += "\r\n";
+    let dt:Date = null;
+    attributes.forEach(attribute => {
+      Object.keys(attribute).forEach(key => {
+        let field = fields.filter(field => {return field.name === key})[0];
+        if (field.type === 'esriFieldTypeDate') {
+          if (attribute[field.name]) {
+
+            dt = new Date(attribute[field.name]);
+            csv += dt.getMonth() + '/' + dt.getDay() + '/' + dt.getFullYear() + ',';
+          }
+        } else {
+          if (attribute[field.name]) {
+            if (attribute[field.name].toString().indexOf('0') === 0) {
+              csv += '"""' + attribute[field.name] + '""",';
+    
+            } else {
+              csv += '"' + attribute[field.name] + '",';
+    
+            }
+          } else {
+            csv += ',';
+
+          }
+
+        }
+
+      });
+      csv += '\r\n';
+    });
+    var encodedUri = encodeURI(csv);
+    element.href = encodedUri;
+    let el:HTMLElement = element as HTMLElement;
+    el.click();
+  }  
 }

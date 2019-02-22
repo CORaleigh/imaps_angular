@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavComponent } from './nav/nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule, MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule, MatSortModule, MatCardModule, MatSelectModule, MatCheckboxModule, MatButtonToggleModule } from '@angular/material';
+import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule, MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule, MatSortModule, MatCardModule, MatSelectModule, MatCheckboxModule, MatButtonToggleModule, MatMenuModule, MatSlideToggleModule, MatDialogModule, ErrorStateMatcher, ShowOnDirtyErrorStateMatcher, MatSnackBarModule } from '@angular/material';
 import { MapComponent } from './map/map.component';
 import { PropertyComponent } from './property/property.component';
 import { PropertySearchComponent } from './property-search/property-search.component';
@@ -26,6 +26,8 @@ import { PhotoGalleryComponent } from './photo-gallery/photo-gallery.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ServiceInfoComponent } from './service-info/service-info.component';
 import { AddressTableComponent } from './address-table/address-table.component';
+import { DisclaimerDialogComponent } from './disclaimer-dialog/disclaimer-dialog.component';
+import { FeedbackDialogComponent } from './feedback-dialog/feedback-dialog.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,9 @@ import { AddressTableComponent } from './address-table/address-table.component';
     AppsComponent,
     PhotoGalleryComponent,
     ServiceInfoComponent,
-    AddressTableComponent
+    AddressTableComponent,
+    DisclaimerDialogComponent,
+    FeedbackDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -73,9 +77,16 @@ import { AddressTableComponent } from './address-table/address-table.component';
     MatCheckboxModule,
     MatButtonToggleModule,
     ColorPickerModule,
-    ScrollingModule
+    ScrollingModule,
+    MatMenuModule,
+    MatSlideToggleModule,
+    MatDialogModule,
+    MatSnackBarModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    {provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher}
+  ],
+  bootstrap: [AppComponent],
+  entryComponents: [DisclaimerDialogComponent, FeedbackDialogComponent]
 })
 export class AppModule { }

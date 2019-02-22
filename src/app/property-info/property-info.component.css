@@ -7,6 +7,10 @@
     overflow-y:auto !important;
 }
 
+.infoContainer div {
+    overflow-x: hidden;
+}
+
 .row {
     display: flex;
     flex-direction: row;
@@ -29,6 +33,7 @@
 
   .mat-card {
   margin: 1em;
+  overflow-x: hidden;
   }
 
   /* .mat-card-image {

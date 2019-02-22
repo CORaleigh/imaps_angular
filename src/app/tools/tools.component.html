@@ -1,4 +1,4 @@
-<mat-tab-group headerPosition="below">
+<mat-tab-group headerPosition="below" [selectedIndex]="shared.toolTabIndex.getValue()" (selectedIndexChange)="shared.toolTabIndex.next($event)">
     <mat-tab>
         <ng-template mat-tab-label>
             <mat-icon>touch_app</mat-icon>

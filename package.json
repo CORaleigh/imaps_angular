@@ -23,6 +23,7 @@
     "@angular/router": "~7.2.0",
     "@types/arcgis-js-api": "^4.10.0",
     "@types/modernizr": "^3.5.2",
+    "angular5-csv": "^0.2.11",
     "body-scroll-lock": "^2.6.1",
     "core-js": "^2.5.4",
     "esri-loader": "^2.6.0",

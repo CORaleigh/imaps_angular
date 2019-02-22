@@ -106,3 +106,16 @@ app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
   overflow-y:auto !important;
 }
 
+.esri-layer-list__item--has-children>.esri-layer-list__list {
+  padding-left: 1em;
+}
+
+
+.alert-snackbar {
+  background-color: #ad1207 !important;
+}
+
+span.esri-bookmarks_bookmark-remove:before {
+  content: "\e600" !important;
+  color: inherit;
+}
