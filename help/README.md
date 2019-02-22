@@ -18,10 +18,10 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/propertylines.png">  
 - Alert when imagery base map year is not available in an area of the county.
+    <br/>
+
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/imageryalert.png">  
 
-    <br/>
-  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/propertylines.png">    
 ### Layer List
 - No longer taking up space in the right side panel
 - Accessible by clicking the  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/layerbutton.png" width="30"> button in the upper right corner of the map
