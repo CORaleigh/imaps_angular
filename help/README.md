@@ -11,6 +11,6 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/toolpanel.png" width="400">
 ### Base Map Gallery
-- Accessible by clicking the  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/basemapbutton.png" width="50"> button
+- Accessible by clicking the  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/basemapbutton.png" width="30"> button
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/basemaps.png" width="400">
