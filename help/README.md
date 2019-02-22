@@ -52,6 +52,14 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Addresses integrated into property info, no longer a separate tab.
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/addresses.png" >
+#### Services Tab
+- Services now display the same information as the popups that you see when clicking on the feature on the map.  This also now included the ability to show photos and other content in the services tab.
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/services.png" >
+- Dropdown added to switch between the service info categories.
+- Well and Septic permits are now displayed in the services tab under the Environmental category, rather than on the property info tab.
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/septicwells.png" >
 ### Tools
 #### Property Select
 - No longer a "freehand" option on polygon or line options.  Holding the left mouse button down achieves the "freehand" drawing ability.  Single click to add single points to the line or polygon.
@@ -59,5 +67,8 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Point option is now the same as the "multipoint" option in the previous iMAPS.  Single click on each property and double click to complete selection.
 - Can now long press on a property without going to the Property Select tool.
 #### Sketch
+- The sketch tool now supports setting the fill and line color, along with the width of the line.
+- Option to draw circles and rectangles
+#### Measure
 - The sketch tool now supports setting the fill and line color, along with the width of the line.
 - Option to draw circles and rectangles
