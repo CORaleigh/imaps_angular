@@ -52,3 +52,12 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Addresses integrated into property info, no longer a separate tab.
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/addresses.png" >
+### Tools
+#### Property Select
+- No longer a "freehand" option on polygon or line options.  Holding the left mouse button down achieves the "freehand" drawing ability.  Single click to add single points to the line or polygon.
+- Option to draw a circle or a rectangle to select properties
+- Point option is now the same as the "multipoint" option in the previous iMAPS.  Single click on each property and double click to complete selection.
+- Can now long press on a property without going to the Property Select tool.
+#### Sketch
+- The sketch tool now supports setting the fill and line color, along with the width of the line.
+- Option to draw circles and rectangles
