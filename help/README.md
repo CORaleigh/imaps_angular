@@ -19,3 +19,6 @@ New version of iMAPS developed with Angular 7.x, Angular Material, and ArcGIS Ja
 - Accessible by clicking the  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/layersbutton.png" width="30"> button in the upper right corner of the map
     <br/>
   <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/layers.png" width="400">
+- Layers are now grouped by category and sub-category
+    <br/>
+  <img src="https://raw.githubusercontent.com/CORaleigh/imaps/master/help/grouplayers.png" width="400">
