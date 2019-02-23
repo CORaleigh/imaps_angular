@@ -882,11 +882,15 @@ export class MapComponent implements OnInit {
   
           } else {
             groupLayer = new GroupLayer({title: groupId, id: groupId});
-            if (localStorage.getItem('visibleLayers').split(',').indexOf(groupId) > -1) {
-              groupLayer.visible = true;
+            if (localStorage.getItem('visibleLayers')) {
+              if (localStorage.getItem('visibleLayers').split(',').indexOf(groupId) > -1) {
+                groupLayer.visible = true;
+              } else {
+                groupLayer.visible = false;
+              }       
             } else {
-              groupLayer.visible = false;
-            }            
+              groupLayer.visible = true;
+            }
             mapView.map.add(groupLayer);
           }
           if (layer.title.indexOf('|') > -1) {
