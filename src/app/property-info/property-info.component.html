@@ -291,8 +291,8 @@
         </div>            
         </mat-card-content>      
         <mat-card-actions *ngIf="_deeds.length > 0">
-                <button mat-button color="accent" (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM+'&RecordDate=')">View Deed</button>
-                <button mat-button color="accent"  (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.BOM_DOC_NUM+'&RecordDate=')">View Plat</button>
+                <button *ngIf="_deeds[0].attributes.DEED_DOC_NUM" mat-button color="accent" (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.DEED_DOC_NUM+'&RecordDate=')">View Deed</button>
+                <button *ngIf="_deeds[0].attributes.BOM_DOC_NUM"  mat-button color="accent"  (click)="openLink('http://services.wakegov.com/booksweb/pdfview.aspx?docid='+_deeds[0].attributes.BOM_DOC_NUM+'&RecordDate=')">View Plat</button>
               </mat-card-actions>
         </mat-card>     
     </div>
