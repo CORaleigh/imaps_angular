@@ -80,6 +80,15 @@ export class PropertyInfoComponent implements OnInit {
     }
   }  
 
+  decodeJurisdiction(value) {
+    switch(value) {
+      case 'RA':
+        return 'Raleigh';
+      case 'CA':
+        return 'Cary';
+      
+    }
+  }
 
   scroll(el) {
     if (el === 'Property') {

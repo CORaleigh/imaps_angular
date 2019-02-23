@@ -48,7 +48,7 @@
                                         City
                                     </div>
                                     <div class="row">
-                                        {{_info.attributes.CITY_DECODE}}
+                                        {{_info.attributes.CITY_DECODE | titlecase}}
                                     </div>        
                                 </div>               
                     </div>
@@ -66,7 +66,7 @@
                                         Jurisdiction
                                     </div>
                                     <div class="row">
-                                        {{_info.attributes.PLANNING_JURISDICTION}}
+                                        {{decodeJurisdiction(_info.attributes.PLANNING_JURISDICTION)}}
                                     </div>        
                                 </div>               
                     </div>           
