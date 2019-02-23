@@ -460,13 +460,15 @@ export class MapComponent implements OnInit {
       }
       this._inRaleigh = count > 0;
     }).then(result => {
-      this._basemapGallery.viewModel.source.basemaps.sort(this.sortBasemaps);
-      this._basemapGallery.viewModel.source.basemaps.forEach((bm,i) => {
-        if (bm.title.indexOf('Base') > -1) {
-          this._basemapGallery.viewModel.source.basemaps.splice(i, 1);
-          this._basemapGallery.viewModel.source.basemaps.unshift(bm);
-        }
-      });
+      setTimeout(() => {        
+        this._basemapGallery.viewModel.source.basemaps.sort(this.sortBasemaps);
+        this._basemapGallery.viewModel.source.basemaps.forEach((bm,i) => {
+          if (bm.title.indexOf('Base') > -1) {
+            this._basemapGallery.viewModel.source.basemaps.splice(i, 1);
+            this._basemapGallery.viewModel.source.basemaps.unshift(bm);
+          }
+        });
+      }, 500);
     });
   }
 
@@ -507,12 +509,17 @@ export class MapComponent implements OnInit {
          expand.watch('expanded', expanded => {
           //@ts-ignore
            this.expandPanelExpanded(expanded, this._basemapGallery);
+           this._basemapGallery.viewModel.source.basemaps.sort(this.sortBasemaps);
+           this._basemapGallery.viewModel.source.basemaps.forEach((bm,i) => {
+             if (bm.title.indexOf('Base') > -1) {
+               this._basemapGallery.viewModel.source.basemaps.splice(i, 1);
+               this._basemapGallery.viewModel.source.basemaps.unshift(bm);
+             }
+           });           
          });
 
         
-         setTimeout(() => {
-          this.filterBasemaps(mapView);
-        });
+
          
 
       mapView.ui.add(expand, "top-right");   
