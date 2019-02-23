@@ -209,7 +209,7 @@ export class MapComponent implements OnInit {
               mapView.map.reorder(singleGraphics, mapView.map.allLayers.length - 1);
 
               mapView.map.allLayers.forEach(layer => {
-                if (localStorage.getItem('visibleLayers')) {
+                if (localStorage.getItem('visibleLayers') && layer.type != 'graphics') {
                   if (localStorage.getItem('visibleLayers').split(',').indexOf(layer.id) > -1) {
                     layer.visible = true;
                   } else {
@@ -379,6 +379,7 @@ export class MapComponent implements OnInit {
         ])  
         let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
         let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics', listMode: 'hide'});
+        debugger
         mapView.map.addMany([multiGraphics, singleGraphics]);
         return [multiGraphics, singleGraphics];
     } catch (error) {
@@ -883,6 +884,8 @@ export class MapComponent implements OnInit {
             groupLayer = new GroupLayer({title: groupId, id: groupId});
             if (localStorage.getItem('visibleLayers').split(',').indexOf(groupId) > -1) {
               groupLayer.visible = true;
+            } else {
+              groupLayer.visible = false;
             }            
             mapView.map.add(groupLayer);
           }
@@ -917,7 +920,8 @@ export class MapComponent implements OnInit {
         } else {
           return 0;
         }
-      })
+      });
+
     })
     .catch(err => {
       // handle any errors
