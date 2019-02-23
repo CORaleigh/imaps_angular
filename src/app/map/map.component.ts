@@ -501,6 +501,8 @@ export class MapComponent implements OnInit {
           view: mapView, 
           expandIconClass: "esri-icon-basemap",
           group: 'top-right',
+          expandTooltip: 'Base Maps',
+
           //@ts-ignore
           content: this._basemapGallery.domNode}
         );          
@@ -604,7 +606,7 @@ export class MapComponent implements OnInit {
             view: mapView, 
             expandIconClass: "esri-icon-layers",
             group: 'top-right',
-  
+            expandTooltip: 'Layers',
             //@ts-ignore
             content:  this._layerList.domNode}
           );
@@ -710,7 +712,8 @@ export class MapComponent implements OnInit {
           content: legend.domNode,
           view: mapView,
           group: 'top-right',
-  
+          expandTooltip: 'Legend',
+
           expandIconClass: "esri-icon-layer-list",
   
           expanded: false
