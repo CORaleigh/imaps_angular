@@ -209,8 +209,12 @@ export class MapComponent implements OnInit {
               mapView.map.reorder(singleGraphics, mapView.map.allLayers.length - 1);
 
               mapView.map.allLayers.forEach(layer => {
-                if (localStorage.getItem('visibleLayers').split(',').indexOf(layer.id) > -1) {
-                  layer.visible = true;
+                if (localStorage.getItem('visibleLayers')) {
+                  if (localStorage.getItem('visibleLayers').split(',').indexOf(layer.id) > -1) {
+                    layer.visible = true;
+                  } else {
+                    layer.visible = false;
+                  }
                 }
                 if (layer.title.indexOf('Property') > -1 && layer.type === 'feature') {
                   mapView.whenLayerView(layer).then((layerView: esri.FeatureLayerView) => {
@@ -867,6 +871,9 @@ export class MapComponent implements OnInit {
   
           } else {
             groupLayer = new GroupLayer({title: groupId, id: groupId});
+            if (localStorage.getItem('visibleLayers').split(',').indexOf(groupId) > -1) {
+              groupLayer.visible = true;
+            }            
             mapView.map.add(groupLayer);
           }
           if (layer.title.indexOf('|') > -1) {
@@ -892,6 +899,15 @@ export class MapComponent implements OnInit {
           }
         
       } i++;} while (i < mapView.map.layers.length - 1);
+      mapView.map.layers.sort((a,b) => {
+        if (a.title > b.title) {
+          return -1;
+        } else if (a.title < b.title) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
     })
     .catch(err => {
       // handle any errors
