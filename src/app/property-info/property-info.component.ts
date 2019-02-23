@@ -86,7 +86,26 @@ export class PropertyInfoComponent implements OnInit {
         return 'Raleigh';
       case 'CA':
         return 'Cary';
-      
+      case 'KN':
+        return 'Knightdale';
+      case 'WF':
+        return 'Wake Forest';     
+      case 'AP':
+        return 'APEX';     
+      case 'ZN':
+        return 'Zebulon';      
+      case 'RO':
+        return 'Rolesville';      
+      case 'WE':
+        return 'Wendell';          
+      case 'FV':
+        return 'Fuquay-Varina';      
+      case 'HS':
+        return 'Holly Springs';    
+      case 'WC':
+        return 'Wake County';      
+      case 'MO':
+        return 'Morrisville';                                                  
     }
   }
 
