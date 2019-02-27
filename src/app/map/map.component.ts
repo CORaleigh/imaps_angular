@@ -83,16 +83,17 @@ export class MapComponent implements OnInit {
 
   constructor(public shared:SharedService, private property:PropertyService, private router:Router, private route: ActivatedRoute, private location:Location, private snackbar:MatSnackBar, private overlayContainer: OverlayContainer) { 
     window.onpagehide = event => {
-      let layers = [];
-
-      shared.mapView.getValue().map.allLayers.forEach(layer => {
-        if (layer.visible) {
-          layers.push(layer.id);
-        }
-      });
-      localStorage.setItem('visibleLayers', layers.toString());      
-      localStorage.setItem('extent', JSON.stringify(shared.mapView.getValue().extent.toJSON()));    
-      localStorage.setItem('basemap', shared.mapView.getValue().map.basemap.portalItem.id);    
+      if (!this.shared.clearStorage) {
+        let layers = [];
+        shared.mapView.getValue().map.allLayers.forEach(layer => {
+          if (layer.visible) {
+            layers.push(layer.id);
+          }
+        });
+        localStorage.setItem('visibleLayers', layers.toString());      
+        localStorage.setItem('extent', JSON.stringify(shared.mapView.getValue().extent.toJSON()));    
+        localStorage.setItem('basemap', shared.mapView.getValue().map.basemap.portalItem.id);    
+      }
     }
     
   }
@@ -451,13 +452,35 @@ export class MapComponent implements OnInit {
             return true;
           }
         };
-        if (count === 0 && mapView.map.basemap.title.indexOf('Imagery') > -1 && mapView.map.basemap.portalItem.tags.indexOf('Wake') < 0) { 
-          let oldtitle = mapView.map.basemap.title;
-          mapView.map.basemap = this._basemapGallery.source.basemaps.getItemAt(this._basemapGallery.source.basemaps.length - 1);
-          this.snackbar.open(oldtitle + ' base map not available for this area, switched to ' + mapView.map.basemap.title, '', {
-            duration: 3000
-          });
-        }
+        setTimeout(()=> {
+          console.log(this._basemapGallery.source.basemaps.length);
+          if (count === 0 && mapView.map.basemap.title.indexOf('Imagery') > -1 && mapView.map.basemap.portalItem.tags.indexOf('Wake') < 0) { 
+            let oldtitle = mapView.map.basemap.title;
+            let year = parseInt(oldtitle.replace('Imagery ', '')) + 1;
+            let basemap = null;
+            let matches:esri.Collection<esri.Basemap>;
+            let basemaps = this._basemapGallery.source.basemaps.clone();
+            do {
+              matches = basemaps.filter(bm => {
+                return bm.title === 'Imagery ' + year;
+              });
+              if (matches.length) {
+                basemap = matches.getItemAt(0);
+                break;
+              }
+              year+=1;
+            } while (year <= new Date().getFullYear());
+            if (basemap) {
+              mapView.map.basemap = basemap;
+  
+            }
+  
+            //mapView.map.basemap = this._basemapGallery.source.basemaps.getItemAt(this._basemapGallery.source.basemaps.length - 1);
+            this.snackbar.open(oldtitle + ' base map not available for this area, switched to ' + mapView.map.basemap.title, '', {
+              duration: 3000
+            });
+          }
+        }, 500)
       }
       this._inRaleigh = count > 0;
     }).then(result => {

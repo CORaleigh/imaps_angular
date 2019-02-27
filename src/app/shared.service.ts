@@ -31,7 +31,7 @@ export class SharedService {
   dark:BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   propertyTabIndex:BehaviorSubject<number> = new BehaviorSubject<number>(0);
   toolTabIndex:BehaviorSubject<number> = new BehaviorSubject<number>(0);
-
+  clearStorage:boolean = false;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
   .pipe(
     map(result => result.matches)

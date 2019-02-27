@@ -116,6 +116,12 @@ export class NavComponent implements OnInit {
 
   }
 
+  clearLocalStorage() {
+    localStorage.clear();
+    this.shared.clearStorage = true;
+    window.location = window.location;
+  }
+
   getCss(url) {
     return document.querySelector("link[href*=\"" + url + "\"]");
   }
