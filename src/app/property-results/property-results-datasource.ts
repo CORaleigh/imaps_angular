@@ -26,6 +26,7 @@ export class PropertyResultsDataSource extends DataSource<PropertyResultsItem> {
 
   constructor(private paginator: MatPaginator, private sort: MatSort, public data: PropertyResultsItem[]) {
     super();
+    
   }
 
   /**
