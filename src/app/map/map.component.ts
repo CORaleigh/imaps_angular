@@ -496,7 +496,7 @@ export class MapComponent implements OnInit {
     });
   }
 
-  async addBasemapGallery(mapView, Expand) {
+  async addBasemapGallery(mapView, expand) {
     try {
       const [BasemapGallery, 
         PortalBasemapsSource, 
@@ -506,6 +506,8 @@ export class MapComponent implements OnInit {
           'esri/widgets/BasemapGallery/support/PortalBasemapsSource',
           'esri/layers/FeatureLayer'
         ])
+
+        
         this._planBoundary = new FeatureLayer({
           portalItem: { 
             id: "a64564abdc1d41bcbb8767ce893c2967"
@@ -521,15 +523,8 @@ export class MapComponent implements OnInit {
           }),
           container: document.createElement("div"),
         });
-        let expand:esri.Expand = new Expand({
-          view: mapView, 
-          expandIconClass: "esri-icon-basemap",
-          group: 'top-right',
-          expandTooltip: 'Base Maps',
-
           //@ts-ignore
-          content: this._basemapGallery.domNode}
-        );          
+        expand.content = this._basemapGallery.domNode;
          //@ts-ignore
          disableBodyScroll(this._basemapGallery.domNode);   
          expand.watch('expanded', expanded => {
@@ -548,7 +543,6 @@ export class MapComponent implements OnInit {
 
          
 
-      mapView.ui.add(expand, "top-right");   
 
       mapView.watch('stationary', stationary => {
         if (stationary) {
@@ -567,13 +561,13 @@ export class MapComponent implements OnInit {
   }  
   
   
-
-  async addLayerList(mapView, Expand) {
+  
+  async addLayerList(mapView, expand) {
     try {
       const [LayerList] = await loadModules([
-          'esri/widgets/LayerList'
-        ])  
- 
+        'esri/widgets/LayerList'
+      ])  
+
         let defineLayerListActions = function (event) {
           event.item.actionsSections = [];
           if (event.item.layer.title.indexOf('Property') > -1 && event.item.layer.type != 'group') {
@@ -626,15 +620,9 @@ export class MapComponent implements OnInit {
             listItemCreatedFunction: defineLayerListActions
           });
   
-          let expand:esri.Expand = new Expand({
-            view: mapView, 
-            expandIconClass: "esri-icon-layers",
-            group: 'top-right',
-            expandTooltip: 'Layers',
+
             //@ts-ignore
-            content:  this._layerList.domNode}
-          );
-  
+          expand.content = this._layerList.domNode;
           expand.watch('expanded', expanded => {
             //@ts-ignore
              this.expandPanelExpanded(expanded, this._layerList);
@@ -709,7 +697,6 @@ export class MapComponent implements OnInit {
               this._propertyLayer.labelingInfo = [labelClass];
             }     
           });
-        mapView.ui.add(expand, "top-right");    
         return true;
 
               
@@ -720,7 +707,7 @@ export class MapComponent implements OnInit {
       }
   }      
 
-  async addLegend(mapView, Expand) {
+  async addLegend(mapView, expand) {
     try {
       const [Legend] = await loadModules([
           'esri/widgets/Legend'
@@ -731,23 +718,16 @@ export class MapComponent implements OnInit {
           style: "classic",
           container: document.createElement("div"),            
         })
-        const legendExpand:esri.Expand = new Expand({
-                   //@ts-ignore
-          content: legend.domNode,
-          view: mapView,
-          group: 'top-right',
-          expandTooltip: 'Legend',
 
-          expandIconClass: "esri-icon-layer-list",
-  
-          expanded: false
-        });
-        legendExpand.watch('expanded', expanded => {
+          //@ts-ignore
+        expand.content = legend.domNode;     
+
+        expand.watch('expanded', expanded => {
           this.expandPanelExpanded(expanded, legend);
          });
+
         //@ts-ignore
         disableBodyScroll(legend.domNode);         
-        mapView.ui.add(legendExpand, "top-right");     
         return true;
 
       } catch (error) {
@@ -761,9 +741,38 @@ export class MapComponent implements OnInit {
       const [Expand] = await loadModules([
           'esri/widgets/Expand'
         ])  
-      this.addBasemapGallery(mapView, Expand).then(() => {
-        this.addLayerList(mapView, Expand).then(() => {
-          this.addLegend(mapView, Expand);
+        const baseExpand:esri.Expand = new Expand({
+          view: mapView, 
+          expandIconClass: "esri-icon-basemap",
+          group: 'top-right',
+          expandTooltip: 'Base Maps'
+          
+        }
+        );          
+      mapView.ui.add(baseExpand, "top-right");   
+      const layerExpand:esri.Expand = new Expand({
+        view: mapView, 
+        expandIconClass: "esri-icon-layers",
+        group: 'top-right',
+        expandTooltip: 'Layers'}
+        );
+        mapView.ui.add(layerExpand, "top-right");      
+        const legendExpand:esri.Expand = new Expand({
+
+        view: mapView,
+        group: 'top-right',
+        expandTooltip: 'Legend',
+
+        expandIconClass: "esri-icon-layer-list",
+
+        expanded: false
+        });     
+
+      mapView.ui.add(legendExpand, "top-right");      
+
+      this.addBasemapGallery(mapView, baseExpand).then(() => {
+        this.addLayerList(mapView, layerExpand).then(() => {
+          this.addLegend(mapView, legendExpand);
         });
       });
     } catch (error) {
