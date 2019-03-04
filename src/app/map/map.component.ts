@@ -770,11 +770,10 @@ export class MapComponent implements OnInit {
 
       mapView.ui.add(legendExpand, "top-right");      
 
-      this.addBasemapGallery(mapView, baseExpand).then(() => {
-        this.addLayerList(mapView, layerExpand).then(() => {
-          this.addLegend(mapView, legendExpand);
-        });
-      });
+      this.addBasemapGallery(mapView, baseExpand);
+      this.addLayerList(mapView, layerExpand);      
+      this.addLegend(mapView, legendExpand);
+
     } catch (error) {
       console.log('We have an error: ' + error);
     }
