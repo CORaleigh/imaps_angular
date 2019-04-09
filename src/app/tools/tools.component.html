@@ -1,31 +1,31 @@
 <mat-tab-group headerPosition="below" [selectedIndex]="shared.toolTabIndex.getValue()" (selectedIndexChange)="shared.toolTabIndex.next($event)">
-    <mat-tab>
+    <mat-tab label="Select">
         <ng-template mat-tab-label>
-            <mat-icon>touch_app</mat-icon>
+            <mat-icon matTooltip="Select">touch_app</mat-icon>
         </ng-template>
         <app-select-tool></app-select-tool>
     </mat-tab>
     <mat-tab label="Sketch">
         <ng-template mat-tab-label>
-            <mat-icon>create</mat-icon>
+            <mat-icon matTooltip="Sketch">create</mat-icon>
         </ng-template>        
         <app-sketch-tool></app-sketch-tool>
     </mat-tab>
     <mat-tab label="Measure">
         <ng-template mat-tab-label>
-            <mat-icon>timeline</mat-icon>
+            <mat-icon matTooltip="Measure">timeline</mat-icon>
         </ng-template>               
         <app-measure-tool></app-measure-tool>
     </mat-tab>
     <mat-tab label="Bookmarks">
             <ng-template mat-tab-label>
-                    <mat-icon>bookmark</mat-icon>
+                    <mat-icon matTooltip="Bookmarks">bookmark</mat-icon>
                 </ng-template>  
                 <app-bookmarks></app-bookmarks>   
     </mat-tab>    
     <mat-tab label="Print">
             <ng-template mat-tab-label>
-                    <mat-icon>print</mat-icon>
+                    <mat-icon  matTooltip="Print">print</mat-icon>
                 </ng-template>  
                 <app-print-tool></app-print-tool>   
     </mat-tab>

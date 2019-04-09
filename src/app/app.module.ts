@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavComponent } from './nav/nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule, MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule, MatSortModule, MatCardModule, MatSelectModule, MatCheckboxModule, MatButtonToggleModule, MatMenuModule, MatSlideToggleModule, MatDialogModule, ErrorStateMatcher, ShowOnDirtyErrorStateMatcher, MatSnackBarModule } from '@angular/material';
+import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTabsModule, MatAutocompleteModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule, MatSortModule, MatCardModule, MatSelectModule, MatCheckboxModule, MatButtonToggleModule, MatMenuModule, MatSlideToggleModule, MatDialogModule, ErrorStateMatcher, ShowOnDirtyErrorStateMatcher, MatSnackBarModule, MatTooltipModule } from '@angular/material';
 import { MapComponent } from './map/map.component';
 import { PropertyComponent } from './property/property.component';
 import { PropertySearchComponent } from './property-search/property-search.component';
@@ -81,7 +81,8 @@ import { FeedbackDialogComponent } from './feedback-dialog/feedback-dialog.compo
     MatMenuModule,
     MatSlideToggleModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTooltipModule
   ],
   providers: [
     {provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher}
