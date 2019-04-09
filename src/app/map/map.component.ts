@@ -785,7 +785,7 @@ export class MapComponent implements OnInit {
       const [Search] = await loadModules([
           'esri/widgets/Search'
         ])  
-        let search:esri.widgetsSearch = new Search({view: mapView});
+        let search:esri.widgetsSearch = new Search({view: mapView, allPlaceholder: 'Location Search'});
         mapView.ui.add( search, "top-right"); 
         search.on('suggest-complete', e => {
           if (document.getElementsByClassName('esri-search__suggestions-menu').length) {
