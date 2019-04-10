@@ -75,22 +75,22 @@ export class NavComponent implements OnInit {
   toggleDarkMode(event) {
     if (!event.checked) {
       document.body.classList.add('light-theme');
-      var link = this.getCss('https://js.arcgis.com/4.10/esri/themes/dark/main.css');
+      var link = this.getCss('https://js.arcgis.com/4.11/esri/themes/dark/main.css');
       if (link) {
         // create & load the css library
         document.head.removeChild(link);
       }
-      loadCss('https://js.arcgis.com/4.10/esri/css/main.css');
+      loadCss('https://js.arcgis.com/4.11/esri/css/main.css');
 
 
     } else {
       document.body.classList.remove('light-theme');
-      var link = this.getCss('https://js.arcgis.com/4.10/esri/themes/main.css');
+      var link = this.getCss('https://js.arcgis.com/4.11/esri/themes/main.css');
       if (link) {
         // create & load the css library
         document.head.removeChild(link);
       }
-      loadCss('https://js.arcgis.com/4.10/esri/themes/dark/main.css');
+      loadCss('https://js.arcgis.com/4.11/esri/themes/dark/main.css');
     }
     this.dark = event.checked;
     this.shared.dark.next(this.dark);
