@@ -194,7 +194,7 @@ export class PropertySearchComponent implements OnInit {
   }
   getCondos(where: string, field: string) {
     this.property.getCondos(this.condoUrl + '/query', where, field).subscribe(result => {
-      debugger
+      
       this.property.fields = result.fields;
       if (result.features.length === 1) {
         let feature = result.features[0];

@@ -62,19 +62,37 @@ export class PropertyInfoComponent implements OnInit {
   }
  
 
+
   async openGoogleStreetview(mapView) {
     try {
 
 
-      const [projection, SpatialReference] = await loadModules(["esri/geometry/projection", "esri/geometry/SpatialReference"])  
-        let trans = projection.getTransformation(this.shared.selectedGraphic.getValue().geometry.spatialReference, new SpatialReference(4326));
-        let geom = projection.project(this.shared.selectedGraphic.getValue().geometry.centroid, new SpatialReference(4326), trans);
+      const [projection, SpatialReference, Locator] = await loadModules(["esri/geometry/projection", "esri/geometry/SpatialReference", "esri/tasks/Locator"])  
+        
+        let locator = new Locator({url:'https://maps.raleighnc.gov/arcgis/rest/services/Locators/CompositeLocator/GeocodeServer',outSpatialReference: {wkid: 4326}});
+        locator.addressToLocations({address: {Street: this._info.attributes.SITE_ADDRESS}, outFields: ['*']}).then(results => {
+          let loc = null;
+          for (let result of results) {
+            if (result.attributes.Loc_name === 'WakeStreets') {
+              loc = result;
+              break;
+            }
+          }
+          if (loc.location) {
+            let url = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+loc.location.latitude+','+loc.location.longitude;
+            window.open(url, '_blank');
+          }
+        });
+      
+      
+       // let trans = projection.getTransformation(this.shared.selectedGraphic.getValue().geometry.spatialReference, new SpatialReference(4326));
+        //let geom = projection.project(this.shared.selectedGraphic.getValue().geometry.centroid, new SpatialReference(4326), trans);
         //@ts-ignore
-        let lat = geom.latitude;
+       // let lat = geom.latitude;
         //@ts-ignore
-        let lng = geom.longitude;
-        let url = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+lat+','+lng;
-        window.open(url, '_blank');
+       // let lng = geom.longitude;
+
+        //window.open(url, '_blank');
     } catch (error) {
       console.log('We have an error: ' + error);
     }

@@ -27,7 +27,7 @@ export class PropertyResultsComponent implements OnInit {
     this.shared.propertyInfo.next({attributes: row});
   };
   exportToCsv() {
-    debugger
+    
     this.property.exportCsv(this.property.fields, this.dataSource.data, this.exportCsvEl.nativeElement);
   }
   ngOnInit() {

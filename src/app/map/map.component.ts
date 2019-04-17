@@ -380,7 +380,7 @@ export class MapComponent implements OnInit {
         ])  
         let multiGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'multiGraphics', listMode: 'hide'});
         let singleGraphics:esri.GraphicsLayer = new GraphicsLayer({title: 'singleGraphics', listMode: 'hide'});
-        debugger
+        
         mapView.map.addMany([multiGraphics, singleGraphics]);
         return [multiGraphics, singleGraphics];
     } catch (error) {

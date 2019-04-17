@@ -98,9 +98,9 @@
                             </div>              
                         </div>                                                  
                 </mat-card-content>
-                <mat-card-actions *ngIf="_deeds.length > 0">
+                <mat-card-actions>
                         <button mat-button color="accent" (click)="openLink('http://services.wakegov.com/realestate/Account.asp?id='+_info.attributes.REID)">Real Estate</button>
-                        <button mat-button color="accent"  (click)="openGoogleStreetview()">Streetview</button>
+                        <button *ngIf="!_info.attributes.SITE_ADDRESS.startsWith('0') " mat-button color="accent"  (click)="openGoogleStreetview()">Streetview</button>
                         <button mat-button color="accent" (click)="openLink('https://coraleigh.github.io/mail-label-generator/pin/'+_info.attributes.PIN_NUM)">Mail Labels</button>
 
                     </mat-card-actions>                
