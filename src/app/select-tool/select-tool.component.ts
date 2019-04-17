@@ -134,8 +134,7 @@ export class SelectToolComponent implements OnInit {
          }
        });    
     if (this.distance > 0) {
-      geometry = geometryEngine.buffer(geometry, this.distance, 'feet');
-
+      geometry = geometryEngine.buffer(geometry.graphic.geometry, this.distance, 'feet');
     }
 
     
@@ -148,12 +147,7 @@ export class SelectToolComponent implements OnInit {
       });
       this.shared.propertyIds.next(oids);
       select.layer.removeAll();
-      if (geometry) {
-        select.layer.add(new Graphic({geometry:geometry}));
-      } else {
-       // select.layer.add(event.graphic);
 
-      }
       propertyLayer.queryRelatedFeatures({relationshipId: 0, objectIds: oids, outFields: ['*']}).then(result => {
         let data = [];
         oids.forEach(oid => {
@@ -167,6 +161,12 @@ export class SelectToolComponent implements OnInit {
         if (data.length === 1) {
           this.shared.propertyInfo.next({attributes: data[0]});
         }
+        if (geometry) {
+          select.layer.add(new Graphic({geometry:geometry, symbol:symbol}));
+        } else {
+         // select.layer.add(event.graphic);
+  
+        }        
       });
 
       });
