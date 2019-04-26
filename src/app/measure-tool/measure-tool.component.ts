@@ -12,26 +12,34 @@ export class MeasureToolComponent implements OnInit {
   @ViewChild('areaDiv') private areaEl: ElementRef;
   @ViewChild('lineDiv') private lineEl: ElementRef;
   @ViewChild('coordDiv') private coordEl: ElementRef;
+  @ViewChild('measureDiv') private measureEl: ElementRef;
 group:any = {};
   constructor(public shared:SharedService) { }
   selected: string = 'distance';
   toolLoaded: boolean = false;
+  _measure:any = null;
+  _cc:esri.CoordinateConversion;
+  _line:esri.DistanceMeasurement2D;
+  _area:esri.AreaMeasurement2D;
   async initialize() {
     try {
-      const [AreaMeasurement2D, DistanceMeasurement2D, CoordinateConversion] = await loadModules([
+      const [AreaMeasurement2D, DistanceMeasurement2D, CoordinateConversion, Measure] = await loadModules([
         'esri/widgets/AreaMeasurement2D',
         'esri/widgets/DistanceMeasurement2D',
-        'esri/widgets/CoordinateConversion'
+        'esri/widgets/CoordinateConversion',
+        'widgets/Measure'
       ]);
-
-      let cc:esri.CoordinateConversion = new CoordinateConversion({view:this._mapView, container: this.coordEl.nativeElement});
-      let line:esri.DistanceMeasurement2D = new DistanceMeasurement2D({view:this._mapView, container: this.areaEl.nativeElement});
-      let area:esri.AreaMeasurement2D = new AreaMeasurement2D({view:this._mapView, container: this.lineEl.nativeElement});
       
-      setTimeout(() => {
-        this.toolLoaded = true;
 
-      },1000);
+      // this._cc = new CoordinateConversion({view:this._mapView, container: this.coordEl.nativeElement});
+      // this._line = new DistanceMeasurement2D({view:this._mapView, container: this.areaEl.nativeElement});
+      // this._area= new AreaMeasurement2D({view:this._mapView, container: this.lineEl.nativeElement});
+      
+      this._measure = new Measure({view:this._mapView, container: this.measureEl.nativeElement});
+      // setTimeout(() => {
+      //   this.toolLoaded = true;
+
+      // },1000);
 
     } catch (error) {
       console.log('We have an error: ' + error);
@@ -72,10 +80,16 @@ group:any = {};
       if (mapView) {
         this._mapView = mapView;
         
-        this.initialize();
+       // this.initialize();
 
       }
-    })
+    })    
+    this.shared.toolTabIndex.subscribe(index => {
+      
+      if (index === 2 && !this._measure) {
+        this.initialize();
+      }
+    });
   }
 
 }

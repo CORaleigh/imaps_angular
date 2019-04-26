@@ -12,27 +12,35 @@ export class PrintToolComponent implements OnInit {
 
   constructor(public shared:SharedService) { }
   private _mapView:esri.MapView;
-
+  private _print:esri.Print;
   ngOnInit() {
     this.shared.mapView.subscribe(mapView => {
       if (mapView) {
         this._mapView = mapView;
         
-        this.initialize();
+        //this.initialize();
 
       }
-    });  }
+    });  
+    this.shared.toolTabIndex.subscribe(index => {
+      if (index === 4 && !this._print) {
+        this.initialize();
+      }
+    });
+  }
   async initialize() {
     try {
-      const [Print] = await loadModules([
-        "esri/widgets/Print"
+      const [Print, esriBundle] = await loadModules([
+        "widgets/Print","dojo/i18n!esri/widgets/Print/nls/Print"
       ]);
-      let print:esri.Print = new Print({
+      esriBundle.titlePlaceHolder = "My Print";
+
+      this._print = new Print({
         view: this._mapView,
         container: this.printEl.nativeElement,
-        printServiceUrl: "https://maps.raleighnc.gov/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        printServiceUrl: "https://mapstest.raleighnc.gov/arcgis/rest/services/Geoprocessing/Print/GPServer/Export%20Web%20Map"
       });
-
+      
 
     } catch (error) {
       console.log('We have an error: ' + error);

@@ -71,7 +71,9 @@ export class NavComponent implements OnInit {
       }
     });
   }
-
+  toggleRotation(event) {
+    this.shared.rotation.next(event.checked);
+  }
   toggleDarkMode(event) {
     if (!event.checked) {
       document.body.classList.add('light-theme');

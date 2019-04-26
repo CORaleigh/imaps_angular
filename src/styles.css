@@ -30,14 +30,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-paginator-container {
     flex-wrap: nowrap !important;
 }
-
+/* 
 app-select-tool .esri-sketch__section.esri-sketch__tool-section:first-child {
     display: none !important;
 }
 
 app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
     display: none !important;
-}
+} */
 
 .esri-legend__layer-body {
     display: flex;
@@ -118,4 +118,99 @@ app-select-tool .esri-sketch__section.esri-sketch__tool-section:last-child {
 span.esri-bookmarks_bookmark-remove:before {
   content: "\e600" !important;
   color: inherit;
+}
+
+
+
+.esri-zoom {
+  flex-flow: row nowrap !important;
+}
+
+.esri-zoom .esri-widget--button:last-child {
+  border-top: none !important;
+}
+
+
+/*CSS for custom widgets*/
+.esri-layer-list__filter {
+  position: fixed;
+  width: 287px;;
+  z-index: 100;
+  padding: 7px;
+  display: flex;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: center;
+  flex: 1;  
+}
+
+.esri-icon-layer-list__icon_visible:before  {
+  
+  color: inherit;
+  content: "\e68e" !important;
+}
+
+.esri-layer-list__list--root {
+  padding-top: 40px !important;
+}
+
+
+.esri-bookmarks__add_container{
+  width: 100%;
+  z-index: 100;
+  padding: 7px;
+  display: flex;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: center;
+  flex: 1;  
+}
+
+.esri-measure__panel-visible {
+  display: block;
+}
+
+.esri-measure__panel-not-visible {
+  display: none;
+}
+
+
+.esri-measure__ccContent {
+  width: 100%;
+}
+
+.esri-coordinate-conversion  {
+  width: 100% !important;
+}
+
+.esri-view-width-xsmall .esri-expand--auto .esri-expand__container--expanded {
+  width: 100% !important;
+  max-width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.esri-view-height-small .esri-expand .esri-widget--panel, .esri-view-height-small .esri-expand .esri-widget--panel-height-only, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel, .esri-view-height-small .esri-ui-corner .esri-component.esri-widget--panel-height-only {
+  max-height: auto !important;
+}
+
+.esri-ui-top-left{
+  flex-flow: row !important;
+}
+
+.esri-ui-top-left .esri-component {
+  margin-left: 0 !important;
+}
+
+.esri-ui-bottom-left .esri-component{
+  margin-right: 0 !important;
+}
+
+.esri-ui-top-right .esri-component {
+  margin-bottom: 0 !important;
+}
+.esri-ui-top-left .esri-expand__content {
+  left: 0 !important;
+  top: 32px !important;
+  margin-left: 0 !important;
 }

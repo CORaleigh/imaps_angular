@@ -53,10 +53,10 @@ export class BookmarksComponent implements OnInit, AfterViewInit {
   }
   ngOnInit() {
     this.shared.toolTabIndex.subscribe(index => {
-      if (index === 3) {
-        setTimeout(()=>{
-          this.addIcons();
-        }, 500);
+      if (index === 3 && !this._bookmarks) {
+        // setTimeout(()=>{
+        //   this.addIcons();
+        // }, 500);
 
       }
     });
@@ -64,10 +64,16 @@ export class BookmarksComponent implements OnInit, AfterViewInit {
       if (mapView) {
         this._mapView = mapView;
         
-        this.initialize();
+        //this.initialize();
 
       }
     });    
+
+    this.shared.toolTabIndex.subscribe(index => {
+      if (index === 3 && !this._bookmarks) {
+        this.initialize();
+      }
+    });
   }
   async addBookmark() {
     try {
@@ -90,7 +96,7 @@ export class BookmarksComponent implements OnInit, AfterViewInit {
   async initialize() {
     try {
       const [Bookmarks, Extent] = await loadModules([
-        "esri/widgets/Bookmarks", "esri/geometry/Extent"
+        "widgets/Bookmarks", "esri/geometry/Extent"
       ]);
       this._bookmarks = new Bookmarks({
         view: this._mapView,

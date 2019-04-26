@@ -13,7 +13,7 @@ export class SelectToolComponent implements OnInit {
   distance: number = 0;
   private _mapView:esri.MapView;
   private _propertyLayer:esri.FeatureLayer;
-  _select:esri.Sketch;
+  _select:any;
   private _doubleClickHandler:IHandle;
   private _lastTool:string;
   constructor(public shared:SharedService) { }
@@ -24,8 +24,18 @@ export class SelectToolComponent implements OnInit {
       if (mapView) {
         this._mapView = mapView;
         
-        this.initialize();
+        //this.initialize();
 
+      }
+    });
+    this.shared.toolTabIndex.subscribe(index => {
+      if (index === 0 && !this._select) {
+        this.initialize();
+      }
+    });
+    this.shared.selectedGraphic.subscribe(graphic => {
+      if (this._select) {
+        this._select.bufferGraphic = graphic;
       }
     });
   }
@@ -39,7 +49,7 @@ export class SelectToolComponent implements OnInit {
         'esri/symbols/SimpleFillSymbol',
         'esri/Graphic',
         'esri/layers/GraphicsLayer',
-        "esri/widgets/Sketch",
+        "widgets/PropertySelect",
         "esri/geometry/Multipoint",
         "esri/geometry/geometryEngine",
         "esri/Color"
@@ -56,27 +66,27 @@ export class SelectToolComponent implements OnInit {
 
       });
       
-        this._select = new Sketch({layer:layer, view: this._mapView, container:this.selectEl.nativeElement});
+        this._select = new Sketch({layer:layer, view: this._mapView, container:this.selectEl.nativeElement, bufferGraphic:this.shared.selectedGraphic.getValue(), propertyLayer: this._propertyLayer});
         this._select.watch('activeTool', tool => {
-          if (['point','polyline','polygon','circle','rectangle'].indexOf(tool) > -1) {
+          if (['point','multipoint','polyline','polygon','circle','rectangle'].indexOf(tool) > -1) {
             
-            if (this._doubleClickHandler) {
-              this._doubleClickHandler.remove();
-            }
+            // if (this._doubleClickHandler) {
+            //   this._doubleClickHandler.remove();
+            // }
             if (tool === 'point') {
-              this._doubleClickHandler = this._mapView.on('double-click', event => {
-                let geometry:esri.Multipoint = new Multipoint();
+              // this._doubleClickHandler = this._mapView.on('double-click', event => {
+              //   let geometry:esri.Multipoint = new Multipoint();
               
-                geometry.spatialReference = this._mapView.spatialReference;
-                geometry.addPoint(event.mapPoint);
-                this._select.layer.graphics.forEach(g => {
-                  geometry.addPoint(g.geometry as esri.Point);
+              //   geometry.spatialReference = this._mapView.spatialReference;
+              //   geometry.addPoint(event.mapPoint);
+              //   this._select.layer.graphics.forEach(g => {
+              //     geometry.addPoint(g.geometry as esri.Point);
 
-                });
-                this.selectCompleted(geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
-                this.shared.sketchTool.reset();
+              //   });
+              //   this.selectCompleted(geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+              //   this.shared.sketchTool.reset();
 
-              });
+              // });
             } else {
               this.shared.sketchTool.reset();
 
@@ -87,31 +97,31 @@ export class SelectToolComponent implements OnInit {
         });
         this.shared.selectTool = this._select;
         this._select.on('create', (event) => {
-        if (event.state === 'complete' ) {
-          if (this._select.activeTool === 'point' || this._lastTool === 'point') {
-            this._select.create('point');
-          } else {
-            this.selectCompleted(event.graphic.geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+        // if (event.state === 'complete' ) {
 
-          }
+        //     debugger
+        //     this.selectCompleted(event.graphic.geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+
+
   
-        } else if (event.state === 'start') {
-          layer.removeAll();
-        }
+        // } else if (event.state === 'start') {
+        //   layer.removeAll();
+        // }
+      });
+      this._select.on('buffered', (event) => {
+        this.shared.propertyResults.next(event.propertyInfo);
+        this.shared.propertyIds.next(event.oids);
       });
       this._select.on('update', (event) => {
         
-        if (event.state === 'complete' ) {
+        // if (event.state === 'complete' ) {
     
-          if (this._select.activeTool === 'point' || this._lastTool === 'point') {
 
-          } else {
-            this.selectCompleted(event.graphic.geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
+        //     this.selectCompleted(event.graphic.geometry, geometryEngine, Graphic, this._select, SimpleFillSymbol, this._propertyLayer);
 
-          }  
-        } else if (event.state === 'start') {
-          layer.removeAll();
-        }
+        // } else if (event.state === 'start') {
+        //   layer.removeAll();
+        // }
       });    
     } catch (error) {
       console.log('We have an error: ' + error);

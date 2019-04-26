@@ -51,9 +51,18 @@ export class MapComponent implements OnInit {
   private isTablet:boolean;
   private isHandset:boolean;
   private _layerList:esri.LayerList;
+  private _legend:esri.Legend;  
+  private _search:esri.widgetsSearch;    
   private _basemapGallery:esri.BasemapGallery;
   private _raleighGroupId:string = 'f2360ebbfe5242a299551e9e7323ef3e';
   private _countyGroupId:string = '2f1f161b96c5406984546432c3d501e1';
+  private _compass:esri.Compass;
+
+  private _select:any;
+  private _measure:any;  
+  private _bookmarks:any;
+  private _print:any;
+
   @Input()
   set zoom(zoom: number) {
     this._zoom = zoom;
@@ -154,7 +163,8 @@ export class MapComponent implements OnInit {
 
       const mapView: esri.MapView = new MapView(mapViewProperties);
       
-   
+      mapView.ui.move([ "zoom"], "bottom-left");        
+      
 
 
 
@@ -167,7 +177,20 @@ export class MapComponent implements OnInit {
                 id: localStorage.getItem('basemap')
               }
             });
-        }        
+        }      
+        
+        this.shared.rotation.subscribe(rotate => {
+          mapView.constraints = {
+            rotationEnabled: rotate
+          }
+          if (rotate) {
+            this.addCompass(mapView);
+          } else {
+            mapView.rotation = 0;
+            mapView.ui.remove(this._compass);
+          }
+        });
+
         this.groupLayers(mapView);
       
         this.mapLoaded.emit(true);
@@ -183,19 +206,16 @@ export class MapComponent implements OnInit {
           }
         });
         this.addScalebar(mapView);
-
-        this.addCompass(mapView).then(() => {
-          this.addTrack(mapView).then(() => {
-            this.addFullscreen(mapView).then(() => {
-              this.addClear(mapView);
-            });
+        this.addTrack(mapView).then(() => {
+          this.addFullscreen(mapView).then(() => {
+            //this.addClear(mapView);
           });
         });
 
-        this.addSearch(mapView).then(() => {
-          this.addExpandWidgets(mapView);
-        });
 
+
+        this.addExpandWidgets(mapView);
+        this.addToolWidgets(mapView);
         this.shared.mapView.next(mapView);
         this.addSelectionLayers(mapView).then((layers) => {
 
@@ -242,7 +262,7 @@ export class MapComponent implements OnInit {
                       }
                     }            
                     mapView.on('hold', e => {
-                      if (!this.shared.sketchTool.activeTool && !this.shared.selectTool.activeTool) {
+                      //if (!this.shared.sketchTool.activeTool && !this.shared.selectTool.activeTool) {
 
                         let geometry = e.mapPoint;
                         this._propertyLayer.queryFeatures({geometry: geometry, returnGeometry: true, outFields: ['OBJECTID']}).then(result => {
@@ -271,7 +291,7 @@ export class MapComponent implements OnInit {
                           });
                     
                           });
-                      }
+                     // }
                     });
                     this.shared.propertyIds.subscribe(ids => {
       
@@ -496,6 +516,25 @@ export class MapComponent implements OnInit {
     });
   }
 
+  addBasemapExpand(mapView, expand) {
+    expand.watch('expanded', expanded => {
+      if (!this._basemapGallery) {
+        this.addBasemapGallery(mapView, expand)
+      } else {
+        //@ts-ignore
+         this.expandPanelExpanded(expanded, this._basemapGallery);
+         this._basemapGallery.viewModel.source.basemaps.sort(this.sortBasemaps);
+         this._basemapGallery.viewModel.source.basemaps.forEach((bm,i) => {
+           if (bm.title.indexOf('Base') > -1) {
+             this._basemapGallery.viewModel.source.basemaps.splice(i, 1);
+             this._basemapGallery.viewModel.source.basemaps.unshift(bm);
+           }
+         });           
+      }
+     });
+
+  }
+
   async addBasemapGallery(mapView, expand) {
     try {
       const [BasemapGallery, 
@@ -524,20 +563,9 @@ export class MapComponent implements OnInit {
           container: document.createElement("div"),
         });
           //@ts-ignore
-        expand.content = this._basemapGallery.domNode;
+       expand.content = this._basemapGallery.domNode;
          //@ts-ignore
          disableBodyScroll(this._basemapGallery.domNode);   
-         expand.watch('expanded', expanded => {
-          //@ts-ignore
-           this.expandPanelExpanded(expanded, this._basemapGallery);
-           this._basemapGallery.viewModel.source.basemaps.sort(this.sortBasemaps);
-           this._basemapGallery.viewModel.source.basemaps.forEach((bm,i) => {
-             if (bm.title.indexOf('Base') > -1) {
-               this._basemapGallery.viewModel.source.basemaps.splice(i, 1);
-               this._basemapGallery.viewModel.source.basemaps.unshift(bm);
-             }
-           });           
-         });
 
         
 
@@ -560,12 +588,20 @@ export class MapComponent implements OnInit {
     }
   }  
   
-  
+  addLayerListExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._layerList) {
+        this.addLayerList(mapView, expand)
+      } else {
+        
+      }
+     });
+  }
   
   async addLayerList(mapView, expand) {
     try {
       const [LayerList] = await loadModules([
-        'esri/widgets/LayerList'
+        'widgets/LayerList'
       ])  
 
         let defineLayerListActions = function (event) {
@@ -706,28 +742,37 @@ export class MapComponent implements OnInit {
 
       }
   }      
-
+  addLegendExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._legend) {
+        this.addLegend(mapView, expand)
+      } else {
+        
+      }
+     });
+  }
   async addLegend(mapView, expand) {
     try {
       const [Legend] = await loadModules([
           'esri/widgets/Legend'
         ])  
  
-        const legend:esri.Legend = new Legend({
+        this._legend = new Legend({
           view: mapView,
           style: "classic",
           container: document.createElement("div"),            
         })
 
+
           //@ts-ignore
-        expand.content = legend.domNode;     
+        expand.content = this._legend.domNode;     
 
         expand.watch('expanded', expanded => {
-          this.expandPanelExpanded(expanded, legend);
+          this.expandPanelExpanded(expanded, this._legend);
          });
 
         //@ts-ignore
-        disableBodyScroll(legend.domNode);         
+        disableBodyScroll(this._legend.domNode);         
         return true;
 
       } catch (error) {
@@ -736,11 +781,82 @@ export class MapComponent implements OnInit {
       }
   }      
 
+  async addToolWidgets(mapView) {
+    try {
+      const [Expand] = await loadModules([
+          'esri/widgets/Expand'
+        ])  
+        const selectExpand:esri.Expand = new Expand({
+          view: mapView, 
+          expandIconClass: "esri-icon-cursor",
+          group: 'top-left',
+          expandTooltip: 'Property Select'
+          
+        }
+        );
+
+      mapView.ui.add(selectExpand, "top-left");     
+      this.addSelectExpand(mapView, selectExpand);
+
+      const measureExpand:esri.Expand = new Expand({
+        view: mapView, 
+        expandIconClass: "esri-icon-polyline",
+        group: 'top-left',
+        expandTooltip: 'Print'
+        
+      }
+      );
+  
+      mapView.ui.add(measureExpand, "top-left");     
+      this.addMeasureExpand(mapView, measureExpand);     
+
+      const bookmarkExpand:esri.Expand = new Expand({
+        view: mapView, 
+        expandIconClass: "esri-icon-bookmark",
+        group: 'top-left',
+        expandTooltip: 'Bookmarks'
+        
+      }
+      );
+
+    mapView.ui.add(bookmarkExpand, "top-left");     
+    this.addBookmarkExpand(mapView, bookmarkExpand);  
+
+    const printExpand:esri.Expand = new Expand({
+      view: mapView, 
+      expandIconClass: "esri-icon-printer",
+      group: 'top-left',
+      expandTooltip: 'Print'
+      
+    }
+    );
+
+    mapView.ui.add(printExpand, "top-left");     
+    this.addPrintExpand(mapView, printExpand);       
+    this.addClear(mapView);
+      } catch (error) {
+        console.log('We have an error: ' + error);
+      }        
+
+
+
+
+  }
+
   async addExpandWidgets(mapView) {
     try {
       const [Expand] = await loadModules([
           'esri/widgets/Expand'
         ])  
+        const searchExpand:esri.Expand = new Expand({
+          view: mapView, 
+          expandIconClass: "esri-icon-search",
+          group: 'top-right',
+          expandTooltip: 'Search By Location'
+          
+        }
+        );
+      mapView.ui.add(searchExpand, "top-right");             
         const baseExpand:esri.Expand = new Expand({
           view: mapView, 
           expandIconClass: "esri-icon-basemap",
@@ -770,24 +886,170 @@ export class MapComponent implements OnInit {
 
       mapView.ui.add(legendExpand, "top-right");      
 
-      this.addBasemapGallery(mapView, baseExpand);
-      this.addLayerList(mapView, layerExpand);      
-      this.addLegend(mapView, legendExpand);
+      this.addSearchExpand(mapView, searchExpand);
+      this.addBasemapExpand(mapView, baseExpand);
+      this.addLayerListExpand(mapView, layerExpand);      
+      this.addLegendExpand(mapView, legendExpand);
+
 
     } catch (error) {
       console.log('We have an error: ' + error);
     }
   }  
 
+  addSelectExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._select) {
+        this.addSelect(mapView, expand)
+      } else {
+        
+      }
+     });
+  }  
 
-  async addSearch(mapView) {
+
+  async addSelect(mapView, expand) {
+    try {
+      const [PropertySelect, GraphicsLayer] = await loadModules([
+          'widgets/PropertySelect',
+          'esri/layers/GraphicsLayer'
+        ])  
+        let layer:esri.GraphicsLayer = new GraphicsLayer({id: 'selectGraphics', title: 'selectGraphics', listMode: 'hide'});
+        mapView.map.add(layer);
+        this._select = new PropertySelect({layer:layer, view: mapView, bufferGraphic:this.shared.selectedGraphic.getValue(), propertyLayer: this._propertyLayer, container: document.createElement("div")});
+        this._select.on('buffered', (event) => {
+          this.shared.propertyResults.next(event.propertyInfo);
+          this.shared.propertyIds.next(event.oids);
+        });
+        this.shared.selectedGraphic.subscribe(graphic => {
+          if (this._select) {
+            this._select.bufferGraphic = graphic;
+          }
+        });
+        //mapView.ui.add( this._search, "top-right"); 
+        //@ts-ignore
+        expand.content = this._select.domNode;     
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+  }     
+  addBookmarkExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._bookmarks) {
+        this.addBookmarks(mapView, expand)
+      } else {
+        
+      }
+     });
+  }  
+
+
+  async addBookmarks(mapView, expand) {
+    try {
+      const [Bookmarks, GraphicsLayer] = await loadModules([
+          'widgets/Bookmarks',
+          'esri/layers/GraphicsLayer'
+        ])  
+        this._bookmarks = new Bookmarks({view: mapView, container: document.createElement("div")});
+
+        //@ts-ignore
+        expand.content = this._bookmarks.domNode;     
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+  }  
+  
+
+  addMeasureExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._measure) {
+        this.addMeasure(mapView, expand)
+      } else {
+        
+      }
+     });
+  }  
+
+
+  async addMeasure(mapView, expand) {
+    try {
+      const [Measure] = await loadModules([
+          'widgets/Measure'
+        ])  
+
+        this._measure = new Measure({
+          view: mapView,
+          container: document.createElement("div")
+        });
+        //@ts-ignore
+        expand.content = this._measure.domNode;     
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+  }              
+
+
+
+  addPrintExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._print) {
+        this.addPrint(mapView, expand)
+      } else {
+        
+      }
+     });
+  }  
+
+
+  async addPrint(mapView, expand) {
+    try {
+      const [Print] = await loadModules([
+          'widgets/Print'
+        ])  
+
+        this._print = new Print({
+          view: mapView,
+          container: document.createElement("div"),
+          printServiceUrl: "https://mapstest.raleighnc.gov/arcgis/rest/services/Geoprocessing/Print/GPServer/Export%20Web%20Map"
+        });
+        //@ts-ignore
+        expand.content = this._print.domNode;     
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+  }              
+
+
+
+  addSearchExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._search) {
+        this.addSearch(mapView, expand)
+      } else {
+        
+      }
+     });
+  }  
+
+
+  async addSearch(mapView, expand) {
     try {
       const [Search] = await loadModules([
           'esri/widgets/Search'
         ])  
-        let search:esri.widgetsSearch = new Search({view: mapView, allPlaceholder: 'Location Search'});
-        mapView.ui.add( search, "top-right"); 
-        search.on('suggest-complete', e => {
+        this._search = new Search({view: mapView, allPlaceholder: 'Location Search', container: document.createElement("div")});
+        //mapView.ui.add( this._search, "top-right"); 
+        //@ts-ignore
+        expand.content = this._search.domNode;     
+        this._search.on('suggest-complete', e => {
           if (document.getElementsByClassName('esri-search__suggestions-menu').length) {
             disableBodyScroll(document.getElementsByClassName('esri-search__suggestions-menu')[0])
           };
@@ -810,6 +1072,7 @@ export class MapComponent implements OnInit {
             if (layer.type === 'graphics') {
               (layer as esri.GraphicsLayer).removeAll();
             }
+            this.shared.selectedGraphic.next(null);
           });
           this.location.replaceState('/');
       
@@ -839,7 +1102,8 @@ export class MapComponent implements OnInit {
       const [Compass] = await loadModules([
           'esri/widgets/Compass'
         ])  
-        mapView.ui.add(new Compass({view:mapView}), "top-left");      
+        this._compass = new Compass({view:mapView})
+        mapView.ui.add(this._compass, "bottom-left", 1);      
         return true;   
       } catch (error) {
         console.log('We have an error: ' + error);
@@ -853,7 +1117,7 @@ export class MapComponent implements OnInit {
         const [Track] = await loadModules([
             'esri/widgets/Track'
           ])  
-          mapView.ui.add(new Track({view:mapView}), "top-left");
+          mapView.ui.add(new Track({view:mapView}), "bottom-left");
           return true;   
         } catch (error) {
           console.log('We have an error: ' + error);
@@ -869,7 +1133,7 @@ export class MapComponent implements OnInit {
         const [Fullscreen] = await loadModules([
             'esri/widgets/Fullscreen'
           ])  
-          mapView.ui.add(new Fullscreen({view:mapView}), "top-left"); 
+          mapView.ui.add(new Fullscreen({view:mapView}), "bottom-left"); 
           return true;   
         } catch (error) {
           console.log('We have an error: ' + error);
@@ -886,7 +1150,7 @@ export class MapComponent implements OnInit {
     loadModules(['esri/widgets/ScaleBar'])
     .then(([ScaleBar]) => { 
       let scale:esri.ScaleBar = new ScaleBar({view:mapView});
-      mapView.ui.add(scale, "bottom-left"); 
+      mapView.ui.add(scale, "bottom-right"); 
       return true;
      
     })
@@ -985,7 +1249,6 @@ export class MapComponent implements OnInit {
 
 
   }
- 
 
   ngOnInit() {
 
@@ -996,6 +1259,7 @@ export class MapComponent implements OnInit {
     this.shared.isHandset$.subscribe(val => {
       this.isTablet = val;
     });    
+
     this.initializeMap();
   
     

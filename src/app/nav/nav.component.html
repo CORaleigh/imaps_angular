@@ -1,8 +1,4 @@
 <mat-toolbar color="primary" *ngIf="shared.showToolbar">
-
-
-  <span>iMAPS</span>
-  <span class="example-fill-remaining-space"></span>
   <button
     type="button"
     aria-label="Toggle sidenav"
@@ -11,6 +7,10 @@
    >
     <mat-icon aria-label="Side nav toggle icon">build</mat-icon>
   </button>    
+
+  <span>iMAPS</span>
+  <span class="example-fill-remaining-space"></span>
+
   <button
     type="button"
     aria-label="Toggle sidenav"
@@ -36,7 +36,15 @@
           Dark Mode
         </mat-slide-toggle>    
       </div>
-  
+      <div mat-menu-item  (click)="$event.stopPropagation();">
+
+        <mat-slide-toggle 
+        class="example-margin"
+        color="primary"
+        [checked]="dark" (change)="toggleRotation($event);">
+          Map Rotation
+        </mat-slide-toggle>    
+      </div> 
   </mat-menu>
   
   <mat-menu #links="matMenu">

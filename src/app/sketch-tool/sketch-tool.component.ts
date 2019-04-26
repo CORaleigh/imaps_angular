@@ -18,6 +18,7 @@ export class SketchToolComponent implements OnInit {
   label:string = '';
   activeTool:string = '';
 
+  _sketch: esri.Sketch;
   _selectedOutlineColor:string;
   constructor(public shared:SharedService, private cpService: ColorPickerService) { }
   async initialize() {
@@ -33,22 +34,22 @@ export class SketchToolComponent implements OnInit {
       
       let layer:esri.GraphicsLayer = new GraphicsLayer({title: 'sketchGraphics', listMode: 'hide'});
       this._mapView.map.add(layer);
-      let sketch:esri.Sketch = new Sketch({layer:layer, view: this._mapView, container:this.sketchEl.nativeElement});
-      this.shared.sketchTool = sketch;
+      this._sketch = new Sketch({layer:layer, view: this._mapView, container:this.sketchEl.nativeElement});
+      this.shared.sketchTool = this._sketch;
 
-      sketch.watch('activeTool', tool => {
+      this._sketch.watch('activeTool', tool => {
         this.activeTool = tool;
         if (['point','polyline','polygon','circle','rectangle'].indexOf(tool) > -1) {
           
           this.shared.selectTool.reset();
         }
       });      
-      sketch.watch('updateGraphics', graphics => {
+      this._sketch.watch('updateGraphics', graphics => {
         graphics.forEach(graphic => {
           
         });
       });
-      sketch.on('create', (event) => {
+      this._sketch.on('create', (event) => {
         if (event.state === 'complete') {
           if (event.graphic.geometry.type === 'point') {
             event.graphic.symbol = {
@@ -133,10 +134,15 @@ export class SketchToolComponent implements OnInit {
       if (mapView) {
         this._mapView = mapView;
         
-        this.initialize();
+        //this.initialize();
 
       }
-    })
+    });
+    this.shared.toolTabIndex.subscribe(index => {
+      if (index === 1 && !this._sketch) {
+        this.initialize();
+      }
+    });    
   }
 
 }

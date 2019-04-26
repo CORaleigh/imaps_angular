@@ -29,6 +29,8 @@ export class SharedService {
   selectTool:esri.Sketch;
   showToolbar:boolean = true;
   dark:BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  rotation:BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
   propertyTabIndex:BehaviorSubject<number> = new BehaviorSubject<number>(0);
   toolTabIndex:BehaviorSubject<number> = new BehaviorSubject<number>(0);
   clearStorage:boolean = false;
