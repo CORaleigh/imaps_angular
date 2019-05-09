@@ -59,6 +59,7 @@ export class MapComponent implements OnInit {
   private _compass:esri.Compass;
 
   private _select:any;
+  private _draw:any;
   private _measure:any;  
   private _bookmarks:any;
   private _print:any;
@@ -165,7 +166,6 @@ export class MapComponent implements OnInit {
       
       mapView.ui.move([ "zoom"], "bottom-left");        
       
-
 
 
       // All resources in the MapView and the map have loaded.
@@ -795,8 +795,20 @@ export class MapComponent implements OnInit {
         }
         );
 
-      mapView.ui.add(selectExpand, "top-left");     
+      mapView.ui.add(selectExpand, "top-left");
       this.addSelectExpand(mapView, selectExpand);
+
+      const drawExpand:esri.Expand = new Expand({
+        view: mapView, 
+        expandIconClass: "esri-icon-edit",
+        group: 'top-left',
+        expandTooltip: 'Draw'
+        
+      }
+      );
+
+    mapView.ui.add(drawExpand, "top-left");     
+    this.addDrawExpand(mapView, drawExpand);
 
       const measureExpand:esri.Expand = new Expand({
         view: mapView, 
@@ -935,6 +947,34 @@ export class MapComponent implements OnInit {
         return false;
       }
   }     
+  addDrawExpand(mapView, expand) { 
+    expand.watch('expanded', expanded => {
+      if (!this._draw) {
+        this.addDraw(mapView, expand)
+      } else {
+        
+      }
+     });
+  }  
+
+  async addDraw(mapView, expand) {
+    try {
+      const [Draw, GraphicsLayer] = await loadModules([
+          'widgets/Draw', 'esri/layers/GraphicsLayer'
+        ])  
+        let layer:esri.GraphicsLayer = new GraphicsLayer({title: 'sketchGraphics', listMode: 'hide'});
+        mapView.map.add(layer);
+        this._draw = new Draw({layer:layer, view: mapView, container: document.createElement("div")});
+
+        //mapView.ui.add( this._search, "top-right"); 
+        //@ts-ignore
+        expand.content = this._draw.domNode;     
+        return true;   
+      } catch (error) {
+        console.log('We have an error: ' + error);
+        return false;
+      }
+  }       
   addBookmarkExpand(mapView, expand) { 
     expand.watch('expanded', expanded => {
       if (!this._bookmarks) {

@@ -214,3 +214,11 @@ span.esri-bookmarks_bookmark-remove:before {
   top: 32px !important;
   margin-left: 0 !important;
 }
+
+.color-picker-visible {
+  display: block;
+}
+
+.color-picker-not-visible {
+  display: none;
+}
